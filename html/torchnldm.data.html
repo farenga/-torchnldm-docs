@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>torchnldm.data package &mdash; TorchNLDM 0.1 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="torchnldm.model package" href="torchnldm.model.html" />
+    <link rel="prev" title="TorchNLDM documentation" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            TorchNLDM
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">torchnldm.data package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-torchnldm.data.dataloader">torchnldm.data.dataloader module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#torchnldm.data.dataloader.DataLoader"><code class="docutils literal notranslate"><span class="pre">DataLoader</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#torchnldm.data.dataloader.DataLoader.get_batch"><code class="docutils literal notranslate"><span class="pre">DataLoader.get_batch()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#torchnldm.data.dataloader.DataLoader.get_sample"><code class="docutils literal notranslate"><span class="pre">DataLoader.get_sample()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#torchnldm.data.dataloader.DataLoader.get_scaler_parameters"><code class="docutils literal notranslate"><span class="pre">DataLoader.get_scaler_parameters()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#torchnldm.data.dataloader.DataLoader.get_section"><code class="docutils literal notranslate"><span class="pre">DataLoader.get_section()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#torchnldm.data.dataloader.DataLoader.get_train_t0_indices"><code class="docutils literal notranslate"><span class="pre">DataLoader.get_train_t0_indices()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#torchnldm.data.dataloader.DataLoader.get_trajectory"><code class="docutils literal notranslate"><span class="pre">DataLoader.get_trajectory()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#torchnldm.data.dataloader.DataLoader.summary"><code class="docutils literal notranslate"><span class="pre">DataLoader.summary()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#torchnldm.data.dataloader.DataLoader.to"><code class="docutils literal notranslate"><span class="pre">DataLoader.to()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#torchnldm.data.dataloader.DataLoaderConfig"><code class="docutils literal notranslate"><span class="pre">DataLoaderConfig</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#torchnldm.data.dataloader.DataLoaderConfig.device"><code class="docutils literal notranslate"><span class="pre">DataLoaderConfig.device</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#torchnldm.data.dataloader.DataLoaderConfig.filepath"><code class="docutils literal notranslate"><span class="pre">DataLoaderConfig.filepath</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#torchnldm.data.dataloader.DataLoaderConfig.reduced_dim"><code class="docutils literal notranslate"><span class="pre">DataLoaderConfig.reduced_dim</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#torchnldm.data.dataloader.DataLoaderConfig.scaler_type"><code class="docutils literal notranslate"><span class="pre">DataLoaderConfig.scaler_type</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#torchnldm.data.dataloader.DataLoaderConfig.time_subsampling"><code class="docutils literal notranslate"><span class="pre">DataLoaderConfig.time_subsampling</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#torchnldm.data.dataloader.DataLoaderConfig.time_validation_split"><code class="docutils literal notranslate"><span class="pre">DataLoaderConfig.time_validation_split</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-torchnldm.data.datascaler">torchnldm.data.datascaler module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#torchnldm.data.datascaler.DataScaler"><code class="docutils literal notranslate"><span class="pre">DataScaler</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#torchnldm.data.datascaler.DataScaler.scale_dataset"><code class="docutils literal notranslate"><span class="pre">DataScaler.scale_dataset()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#torchnldm.data.datascaler.DataScaler.scale_feature"><code class="docutils literal notranslate"><span class="pre">DataScaler.scale_feature()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-torchnldm.data">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="torchnldm.model.html">torchnldm.model package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torchnldm.train.html">torchnldm.train package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torchnldm.evaluate.html">torchnldm.evaluate package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torchnldm.utils.html">torchnldm.utils package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">TorchNLDM</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">torchnldm.data package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/torchnldm.data.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="torchnldm-data-package">
+<h1>torchnldm.data package<a class="headerlink" href="#torchnldm-data-package" title="Permalink to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading"></a></h2>
+</section>
+<section id="module-torchnldm.data.dataloader">
+<span id="torchnldm-data-dataloader-module"></span><h2>torchnldm.data.dataloader module<a class="headerlink" href="#module-torchnldm.data.dataloader" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="torchnldm.data.dataloader.DataLoader">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">torchnldm.data.dataloader.</span></span><span class="sig-name descname"><span class="pre">DataLoader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#torchnldm.data.dataloader.DataLoaderConfig" title="torchnldm.data.dataloader.DataLoaderConfig"><span class="pre">DataLoaderConfig</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchnldm/data/dataloader.html#DataLoader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchnldm.data.dataloader.DataLoader" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>DataLoader class. It allows to load and manage PDEGen (<a class="reference external" href="https://github.com/farenga/pdegen/">https://github.com/farenga/pdegen/</a>) datasets, or .hdf5 files complying
+with PDEGen dataset structure.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><dl class="field-list simple">
+<dt class="field-odd">config<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(DataLoaderConfig), dataset configuration object.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="torchnldm.data.dataloader.DataLoader.get_batch">
+<span class="sig-name descname"><span class="pre">get_batch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">section_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t0_index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size_params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size_timesteps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size_nodes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">torch.Tensor</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/torchnldm/data/dataloader.html#DataLoader.get_batch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchnldm.data.dataloader.DataLoader.get_batch" title="Permalink to this definition"></a></dt>
+<dd><p>Returns a batch of trajectories (ut), their initial values (u0) the respective parameters 
+instances (mut0_batch), and timesteps (t_batch), sampled from the Snapshots and Parameters 
+tensors (S,P), given batch sizes an initial timestep. In the case batch_size_nodes is passed, 
+the output will be in field form, so the last dimension of the state trajectory tensor will be 
+of shape (batch_size_nodes,n) instead than Nh.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><dl class="field-list simple">
+<dt class="field-odd">section_id<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(str), id of the dataset section (‘complete’,’train’,’validation’).</p>
+</dd>
+<dt class="field-even">t0_index<span class="colon">:</span></dt>
+<dd class="field-even"><p>(int), index of the initial timestep (&lt;Nt-batch_size_timesteps)</p>
+</dd>
+<dt class="field-odd">batch_size_params<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(int), number of sampled trajectories (&lt;=N)</p>
+</dd>
+<dt class="field-even">batch_size_timesteps<span class="colon">:</span></dt>
+<dd class="field-even"><p>(int), trajectories length (&lt;=Nt)</p>
+</dd>
+<dt class="field-odd">batch_size_nodes<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(int), number of sampled mesh nodes (&lt;=M)</p>
+</dd>
+</dl>
+</dd>
+<dt>Returns:</dt><dd><dl class="field-list simple">
+<dt class="field-odd">u0<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(Tensor), batch of initial values, shape = (batch_size_params, Nh) or (…,batch_size_nodes,n)</p>
+</dd>
+<dt class="field-even">mut0<span class="colon">:</span></dt>
+<dd class="field-even"><p>(Tensor), batch of parameters and timesteps related to the initial values, shape = (batch_size_params, Np)</p>
+</dd>
+<dt class="field-odd">x<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(Tensor), batch of sampled mesh nodes coordinates, shape = (batch_size, batch_size_nodes, d)</p>
+</dd>
+<dt class="field-even">t<span class="colon">:</span></dt>
+<dd class="field-even"><p>(Tensor), 1d tensor of timesteps, shape = (batch_size_timesteps,)</p>
+</dd>
+<dt class="field-odd">ut<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(Tensor), batch of state trajectories, shape = (batch_size_timesteps, batch_size_params, Nh) or (…,batch_size_nodes,n)</p>
+</dd>
+<dt class="field-even">mut<span class="colon">:</span></dt>
+<dd class="field-even"><p>(Tensor), batch of parameters and timesteps related to the whole trajectory, shape = (batch_size_timesteps, batch_size, Np)</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="torchnldm.data.dataloader.DataLoader.get_sample">
+<span class="sig-name descname"><span class="pre">get_sample</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">i</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">j</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">torch.Tensor</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/torchnldm/data/dataloader.html#DataLoader.get_sample"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchnldm.data.dataloader.DataLoader.get_sample" title="Permalink to this definition"></a></dt>
+<dd><p>Returns a sample from the S and P tensors.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><dl class="field-list simple">
+<dt class="field-odd">i<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(int), param instance selector, index along 0-th dimension (&lt;N).</p>
+</dd>
+<dt class="field-even">j<span class="colon">:</span></dt>
+<dd class="field-even"><p>(int), time-step selector, index along 1-st dimension (&lt;Nt).</p>
+</dd>
+</dl>
+</dd>
+<dt>Returns:</dt><dd><p>uh(t_j;mu_i), (mu_i,t_j)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="torchnldm.data.dataloader.DataLoader.get_scaler_parameters">
+<span class="sig-name descname"><span class="pre">get_scaler_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">return_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tensor</span></span></span><a class="reference internal" href="_modules/torchnldm/data/dataloader.html#DataLoader.get_scaler_parameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchnldm.data.dataloader.DataLoader.get_scaler_parameters" title="Permalink to this definition"></a></dt>
+<dd><p>Returns the dataset’s scaling parameters.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="torchnldm.data.dataloader.DataLoader.get_section">
+<span class="sig-name descname"><span class="pre">get_section</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">section_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'complete'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">torch.Tensor</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">torch.Tensor</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/torchnldm/data/dataloader.html#DataLoader.get_section"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchnldm.data.dataloader.DataLoader.get_section" title="Permalink to this definition"></a></dt>
+<dd><p>Returns a section of the dataset.
+Instead of creating multiple tensors, accounting for the train and validation splits, the splits
+are managed via indexing over the time-dimension.
+Args:</p>
+<blockquote>
+<div><dl class="field-list simple">
+<dt class="field-odd">section_id<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(str): name of the dataset subsection (‘complete’,’train’,’validation’).</p>
+</dd>
+</dl>
+</div></blockquote>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>S (Tensor), P (Tensor), max_timesteps (int).</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="torchnldm.data.dataloader.DataLoader.get_train_t0_indices">
+<span class="sig-name descname"><span class="pre">get_train_t0_indices</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">timesteps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shuffle</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/torchnldm/data/dataloader.html#DataLoader.get_train_t0_indices"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchnldm.data.dataloader.DataLoader.get_train_t0_indices" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Args:</dt><dd><p>timesteps (int): number of timesteps (sequence length)</p>
+</dd>
+<dt>Returns:</dt><dd><p>section_id</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="torchnldm.data.dataloader.DataLoader.get_trajectory">
+<span class="sig-name descname"><span class="pre">get_trajectory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">section_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t0_index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param_index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timesteps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_form</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">torch.Tensor</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/torchnldm/data/dataloader.html#DataLoader.get_trajectory"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchnldm.data.dataloader.DataLoader.get_trajectory" title="Permalink to this definition"></a></dt>
+<dd><p>Returns a single trajectory (ut), their initial values (u0) the respective parameters 
+instances (mut0_batch), and timesteps (t_batch), sampled from the Snapshots and Parameters 
+tensors (S,P), given batch sizes an initial timestep. In the case batch_size_nodes is passed, 
+the output will be in field form, so the last dimension of the state trajectory tensor will be 
+of shape (batch_size_nodes,n) instead than Nh.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><dl class="field-list simple">
+<dt class="field-odd">section_id<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(str), id of the dataset section (‘complete’,’train’,’validation’).</p>
+</dd>
+<dt class="field-even">t0_index<span class="colon">:</span></dt>
+<dd class="field-even"><p>(int), index of the initial timestep (&lt;Nt-batch_size_timesteps)</p>
+</dd>
+<dt class="field-odd">param_index<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(int), index of sampled paramter instance (&lt;=N)</p>
+</dd>
+<dt class="field-even">timesteps<span class="colon">:</span></dt>
+<dd class="field-even"><p>(int), trajectories length (&lt;=Nt)</p>
+</dd>
+<dt class="field-odd">field_form<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(bool), flag enabling field form</p>
+</dd>
+</dl>
+</dd>
+<dt>Returns:</dt><dd><dl class="field-list simple">
+<dt class="field-odd">u0<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(Tensor), initial value, shape = (Nh,) or (M,n)</p>
+</dd>
+<dt class="field-even">mut0<span class="colon">:</span></dt>
+<dd class="field-even"><p>(Tensor), parameters instances and timesteps related to the initial value, shape = (Np)</p>
+</dd>
+<dt class="field-odd">x<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(Tensor), mesh nodes coordinates, shape = (M, d)</p>
+</dd>
+<dt class="field-even">t<span class="colon">:</span></dt>
+<dd class="field-even"><p>(Tensor), 1d tensor of timesteps, shape = (batch_size_timesteps,)</p>
+</dd>
+<dt class="field-odd">ut<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(Tensor), state trajectory, shape = (timesteps, Nh) or (…,batch_size_nodes,n)</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="torchnldm.data.dataloader.DataLoader.summary">
+<span class="sig-name descname"><span class="pre">summary</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/torchnldm/data/dataloader.html#DataLoader.summary"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchnldm.data.dataloader.DataLoader.summary" title="Permalink to this definition"></a></dt>
+<dd><p>Prints a summary of the dataset’s infos.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="torchnldm.data.dataloader.DataLoader.to">
+<span class="sig-name descname"><span class="pre">to</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">device</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">device(type='cpu')</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/torchnldm/data/dataloader.html#DataLoader.to"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchnldm.data.dataloader.DataLoader.to" title="Permalink to this definition"></a></dt>
+<dd><p>Moves the dataset’s tensors to the specified device.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="torchnldm.data.dataloader.DataLoaderConfig">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">torchnldm.data.dataloader.</span></span><span class="sig-name descname"><span class="pre">DataLoaderConfig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filepath</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_validation_split</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_subsampling</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scaler_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reduced_dim</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">device</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">device(type='cpu')</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchnldm/data/dataloader.html#DataLoaderConfig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchnldm.data.dataloader.DataLoaderConfig" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>DataLoader class configuration object</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="torchnldm.data.dataloader.DataLoaderConfig.device">
+<span class="sig-name descname"><span class="pre">device</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">device</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">device(type='cpu')</span></em><a class="headerlink" href="#torchnldm.data.dataloader.DataLoaderConfig.device" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="torchnldm.data.dataloader.DataLoaderConfig.filepath">
+<span class="sig-name descname"><span class="pre">filepath</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#torchnldm.data.dataloader.DataLoaderConfig.filepath" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="torchnldm.data.dataloader.DataLoaderConfig.reduced_dim">
+<span class="sig-name descname"><span class="pre">reduced_dim</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#torchnldm.data.dataloader.DataLoaderConfig.reduced_dim" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="torchnldm.data.dataloader.DataLoaderConfig.scaler_type">
+<span class="sig-name descname"><span class="pre">scaler_type</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#torchnldm.data.dataloader.DataLoaderConfig.scaler_type" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="torchnldm.data.dataloader.DataLoaderConfig.time_subsampling">
+<span class="sig-name descname"><span class="pre">time_subsampling</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#torchnldm.data.dataloader.DataLoaderConfig.time_subsampling" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="torchnldm.data.dataloader.DataLoaderConfig.time_validation_split">
+<span class="sig-name descname"><span class="pre">time_validation_split</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#torchnldm.data.dataloader.DataLoaderConfig.time_validation_split" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-torchnldm.data.datascaler">
+<span id="torchnldm-data-datascaler-module"></span><h2>torchnldm.data.datascaler module<a class="headerlink" href="#module-torchnldm.data.datascaler" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="torchnldm.data.datascaler.DataScaler">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">torchnldm.data.datascaler.</span></span><span class="sig-name descname"><span class="pre">DataScaler</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scaler_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#torchnldm.data.dataloader.DataLoader" title="torchnldm.data.dataloader.DataLoader"><span class="pre">DataLoader</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchnldm/data/datascaler.html#DataScaler"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchnldm.data.datascaler.DataScaler" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>DataScaler class. It allow to manage datasets scaling and features scaling.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="torchnldm.data.datascaler.DataScaler.scale_dataset">
+<span class="sig-name descname"><span class="pre">scale_dataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#torchnldm.data.dataloader.DataLoader" title="torchnldm.data.dataloader.DataLoader"><span class="pre">DataLoader</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/torchnldm/data/datascaler.html#DataScaler.scale_dataset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchnldm.data.datascaler.DataScaler.scale_dataset" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Args:</dt><dd><dl class="field-list simple">
+<dt class="field-odd">dataset<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(DataLoader), dataset to be rescaled.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="torchnldm.data.datascaler.DataScaler.scale_feature">
+<span class="sig-name descname"><span class="pre">scale_feature</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">feature</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feature_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'u'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inverse</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tensor</span></span></span><a class="reference internal" href="_modules/torchnldm/data/datascaler.html#DataScaler.scale_feature"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchnldm.data.datascaler.DataScaler.scale_feature" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Args:</dt><dd><dl class="field-list simple">
+<dt class="field-odd">feature<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(Tensor), dataset to be scaled.</p>
+</dd>
+<dt class="field-even">feature_type<span class="colon">:</span></dt>
+<dd class="field-even"><p>(str), argument indicating the type of the feature to be rescaled (‘u’,’mu’,’t’,’x’).</p>
+</dd>
+<dt class="field-odd">inverse<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(bool), flag to enable inverse scaling.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-torchnldm.data">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-torchnldm.data" title="Permalink to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="TorchNLDM documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="torchnldm.model.html" class="btn btn-neutral float-right" title="torchnldm.model package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Nicola Farenga.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

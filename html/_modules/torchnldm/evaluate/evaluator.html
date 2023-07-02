@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>torchnldm.evaluate.evaluator &mdash; TorchNLDM 0.1 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            TorchNLDM
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../torchnldm.data.html">torchnldm.data package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../torchnldm.model.html">torchnldm.model package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../torchnldm.train.html">torchnldm.train package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../torchnldm.evaluate.html">torchnldm.evaluate package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../torchnldm.utils.html">torchnldm.utils package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">TorchNLDM</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">torchnldm.evaluate.evaluator</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for torchnldm.evaluate.evaluator</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
+
+<span class="kn">from</span> <span class="nn">..model.nldm</span> <span class="kn">import</span> <span class="n">NLDM</span><span class="p">,</span> <span class="n">NLDF</span>
+<span class="kn">from</span> <span class="nn">..data.dataloader</span> <span class="kn">import</span> <span class="n">DataLoader</span>
+<span class="kn">from</span> <span class="nn">..utils.addtypes</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">..utils.metrics</span> <span class="kn">import</span> <span class="n">MetricsLogger</span>
+<span class="kn">from</span> <span class="nn">..utils.config</span> <span class="kn">import</span> <span class="n">ConfigBase</span>
+
+
+<div class="viewcode-block" id="EvaluatorConfig"><a class="viewcode-back" href="../../../torchnldm.evaluate.html#torchnldm.evaluate.evaluator.EvaluatorConfig">[docs]</a><span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">EvaluatorConfig</span><span class="p">(</span><span class="n">ConfigBase</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Configuration for Evaluation routine</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        timesteps (int): length of the predicted sequences (subtrajectories).</span>
+<span class="sd">        start_t_index (int): index from which starting to extract the testing subtrajectories.</span>
+<span class="sd">        sample_subtrajectories (tuple[int,str]): number of subsampled subtrajectories and type of subsampling (N,&#39;regular&#39;), (N,&#39;random&#39;).</span>
+<span class="sd">        enable_scaling (bool): flag to enable the model internal pre/postprocessing.</span>
+<span class="sd">        enable_tf32 (bool): flag to enable tensorfloat32 precision.</span>
+<span class="sd">        enable_amp (bool): flag to enable automatic mixed precision.</span>
+<span class="sd">        compile_mode (bool): flag to enable torch compiling.</span>
+<span class="sd">        output_directory (str): directory path for storing output metrics.</span>
+<span class="sd">        metrics_filename (str): metrics filename.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">timesteps</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">20</span>
+    <span class="n">start_t_index</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">sample_subtrajectories</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">enable_scaling</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">enable_tf32</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">enable_amp</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">compile_mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">output_directory</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">metrics_filename</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">device</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s1">&#39;cpu&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Evaluator"><a class="viewcode-back" href="../../../torchnldm.evaluate.html#torchnldm.evaluate.evaluator.Evaluator">[docs]</a><span class="k">class</span> <span class="nc">Evaluator</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Evaluator class. Intended to be used for evaluating the performances of NLDM and NLDF models.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        :model: (NLDM,NLDF), model to be tested.</span>
+<span class="sd">        :dataset: (DataLoader), test dataset loader.</span>
+<span class="sd">        :config: (EvaluatorConfig), evaluator configuration.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="n">NLDM</span> <span class="ow">or</span> <span class="n">NLDF</span><span class="p">,</span> <span class="n">dataset</span><span class="p">:</span> <span class="n">DataLoader</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">EvaluatorConfig</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        
+        <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">enable_tf32</span> <span class="ow">and</span> <span class="n">config</span><span class="o">.</span><span class="n">enable_amp</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Conflict between selected precisions, only one flag between &quot;enable_tf32&quot; and &quot;enable_amp&quot; can be enabled.&#39;</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">model</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__parse_config</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+
+
+    <span class="k">def</span> <span class="nf">__parse_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">config</span><span class="p">:</span> <span class="n">EvaluatorConfig</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        
+        <span class="c1"># Prior checks</span>
+        <span class="k">assert</span> <span class="n">config</span><span class="o">.</span><span class="n">timesteps</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;timesteps must be &gt;0, got instead </span><span class="si">{</span><span class="n">config</span><span class="o">.</span><span class="n">timesteps</span><span class="si">}</span><span class="s1">&#39;</span>
+        <span class="k">assert</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">config</span><span class="o">.</span><span class="n">start_t_index</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">Nt</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;start_t_index must be &gt;=0, &lt;Nt=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">Nt</span><span class="si">}</span><span class="s1">, got instead </span><span class="si">{</span><span class="n">config</span><span class="o">.</span><span class="n">start_t_index</span><span class="si">}</span><span class="s1">&#39;</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_subtrajectories</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">Nt</span> <span class="o">-</span> <span class="n">config</span><span class="o">.</span><span class="n">start_t_index</span> <span class="o">-</span> <span class="n">config</span><span class="o">.</span><span class="n">timesteps</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_subtrajectories</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;No subtrajectories available for evaluation with timesteps=</span><span class="si">{</span><span class="n">config</span><span class="o">.</span><span class="n">timesteps</span><span class="si">}</span><span class="s1"> and start_t_index=</span><span class="si">{</span><span class="n">config</span><span class="o">.</span><span class="n">start_t_index</span><span class="si">}</span><span class="s1">, consider changing one of the two input parameters.&#39;</span>
+        
+        <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">sample_subtrajectories</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="n">config</span><span class="o">.</span><span class="n">sample_subtrajectories</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;regular&#39;</span><span class="p">,</span><span class="s1">&#39;random&#39;</span><span class="p">),</span> <span class="sa">f</span><span class="s1">&#39;sampling_method must be either &quot;regular&quot; or &quot;random&quot;.&#39;</span>
+            <span class="k">assert</span> <span class="mi">0</span> <span class="o">&lt;</span> <span class="n">config</span><span class="o">.</span><span class="n">sample_subtrajectories</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_subtrajectories</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;sample_subtrajectories must be a value between 1 and n_subtrajectories=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">n_subtrajectories</span><span class="si">}</span><span class="s1">, got instead </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">sample_subtrajectories</span><span class="si">}</span><span class="s1">.&#39;</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">timesteps</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">timesteps</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">start_t_index</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">start_t_index</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sample_subtrajectories</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">sample_subtrajectories</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">enable_scaling</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">enable_scaling</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">enable_tf32</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">enable_tf32</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">enable_amp</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">enable_amp</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">compile_mode</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">compile_mode</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">output_directory</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">output_directory</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">metrics_filename</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">metrics_filename</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">device</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">device</span>
+        
+    <span class="k">def</span> <span class="nf">__set_output_directory</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_directory</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_directory</span><span class="p">):</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_directory</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__set_device</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__set_metrics_logger</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">metrics_logger</span> <span class="o">=</span> <span class="n">MetricsLogger</span><span class="p">([</span><span class="s1">&#39;param_index&#39;</span><span class="p">,</span><span class="s1">&#39;t0_index&#39;</span><span class="p">,</span><span class="s1">&#39;error&#39;</span><span class="p">,</span><span class="s1">&#39;relative_error&#39;</span><span class="p">,</span><span class="s1">&#39;eval_time&#39;</span><span class="p">])</span>
+
+    <span class="k">def</span> <span class="nf">__set_tf32_backend</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">torch</span><span class="o">.</span><span class="n">backends</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">matmul</span><span class="o">.</span><span class="n">allow_tf32</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">enable_tf32</span>
+        <span class="n">torch</span><span class="o">.</span><span class="n">backends</span><span class="o">.</span><span class="n">cudnn</span><span class="o">.</span><span class="n">allow_tf32</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">enable_tf32</span>
+
+<div class="viewcode-block" id="Evaluator.eval"><a class="viewcode-back" href="../../../torchnldm.evaluate.html#torchnldm.evaluate.evaluator.Evaluator.eval">[docs]</a>    <span class="nd">@torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">()</span>
+    <span class="k">def</span> <span class="nf">eval</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Method starting the evaluation routine.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__set_output_directory</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__set_metrics_logger</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__set_device</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__set_tf32_backend</span><span class="p">()</span>        
+        
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">compile_mode</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">evaluate</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">evaluate</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">compile_mode</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">evaluate</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">evaluate</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample_subtrajectories</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">n_samples</span><span class="p">,</span> <span class="n">sampling_method</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample_subtrajectories</span>
+            <span class="k">if</span> <span class="n">sampling_method</span><span class="o">==</span><span class="s1">&#39;random&#39;</span><span class="p">:</span> 
+                <span class="n">t0_indices</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">random</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_subtrajectories</span><span class="p">),</span><span class="n">n_samples</span><span class="p">))</span>
+            <span class="k">elif</span> <span class="n">sampling_method</span><span class="o">==</span><span class="s1">&#39;regular&#39;</span><span class="p">:</span>
+                <span class="n">t0_indices</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">n_subtrajectories</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">n_subtrajectories</span><span class="o">//</span><span class="n">n_samples</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">t0_indices</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_subtrajectories</span><span class="p">))</span>
+
+        <span class="n">t0_indices</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_t_index</span><span class="p">,</span> <span class="n">t0_indices</span><span class="p">))</span>
+
+        <span class="n">N_test</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">t0_indices</span><span class="p">)</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">N</span>
+
+        <span class="n">tot_pred_error</span><span class="p">,</span> <span class="n">tot_pred_rel_error</span><span class="p">,</span> <span class="n">tot_pred_t</span> <span class="o">=</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span>
+
+        <span class="k">for</span> <span class="n">param_index</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">N</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">t0_index</span> <span class="ow">in</span> <span class="n">t0_indices</span><span class="p">:</span>
+                
+                <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">amp</span><span class="o">.</span><span class="n">autocast</span><span class="p">(</span><span class="n">enabled</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">enable_amp</span><span class="p">):</span>
+                    <span class="n">pred_error</span><span class="p">,</span> <span class="n">pred_rel_error</span><span class="p">,</span> <span class="n">pred_t</span> <span class="o">=</span> <span class="n">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">,</span> <span class="n">t0_index</span><span class="p">,</span> <span class="n">param_index</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">timesteps</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">enable_scaling</span><span class="p">)</span>
+                
+                <span class="n">tot_pred_error</span> <span class="o">+=</span> <span class="n">pred_error</span>
+                <span class="n">tot_pred_rel_error</span> <span class="o">+=</span> <span class="n">pred_rel_error</span>
+                <span class="n">tot_pred_t</span> <span class="o">+=</span> <span class="n">pred_t</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">metrics_logger</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="s1">&#39;param_index&#39;</span><span class="p">,</span> <span class="n">param_index</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">metrics_logger</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="s1">&#39;t0_index&#39;</span><span class="p">,</span> <span class="n">t0_index</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">metrics_logger</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="s1">&#39;error&#39;</span><span class="p">,</span> <span class="n">pred_error</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">metrics_logger</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="s1">&#39;relative_error&#39;</span><span class="p">,</span> <span class="n">pred_rel_error</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">metrics_logger</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="s1">&#39;eval_time&#39;</span><span class="p">,</span><span class="n">pred_t</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="kc">None</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">metrics_filename</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_directory</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">metrics_logger</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_directory</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">metrics_filename</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Average Error: </span><span class="si">{</span><span class="n">tot_pred_error</span><span class="o">/</span><span class="n">N_test</span><span class="si">}</span><span class="s1">, Average Relative Error: </span><span class="si">{</span><span class="n">tot_pred_rel_error</span><span class="o">/</span><span class="n">N_test</span><span class="si">}</span><span class="s1">, Average Inference Time: </span><span class="si">{</span><span class="n">tot_pred_t</span><span class="o">/</span><span class="n">N_test</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span></div></div>
+        
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Nicola Farenga.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,1344 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>torchnldm.model package &mdash; TorchNLDM 0.1 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="torchnldm.train package" href="torchnldm.train.html" />
+    <link rel="prev" title="torchnldm.data package" href="torchnldm.data.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            TorchNLDM
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="torchnldm.data.html">torchnldm.data package</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">torchnldm.model package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-torchnldm.model.ae">torchnldm.model.ae module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#torchnldm.model.ae.FieldDecoder"><code class="docutils literal notranslate"><span class="pre">FieldDecoder</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#torchnldm.model.ae.FieldDecoder.forward"><code class="docutils literal notranslate"><span class="pre">FieldDecoder.forward()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#torchnldm.model.ae.FieldEncoder"><code class="docutils literal notranslate"><span class="pre">FieldEncoder</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#torchnldm.model.ae.FieldEncoder.forward"><code class="docutils literal notranslate"><span class="pre">FieldEncoder.forward()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#torchnldm.model.ae.StateDecoder"><code class="docutils literal notranslate"><span class="pre">StateDecoder</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#torchnldm.model.ae.StateDecoder.forward"><code class="docutils literal notranslate"><span class="pre">StateDecoder.forward()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#torchnldm.model.ae.StateEncoder"><code class="docutils literal notranslate"><span class="pre">StateEncoder</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#torchnldm.model.ae.StateEncoder.forward"><code class="docutils literal notranslate"><span class="pre">StateEncoder.forward()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-torchnldm.model.nde">torchnldm.model.nde module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#torchnldm.model.nde.NeuralDE"><code class="docutils literal notranslate"><span class="pre">NeuralDE</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#torchnldm.model.nde.NeuralDE.forward"><code class="docutils literal notranslate"><span class="pre">NeuralDE.forward()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#torchnldm.model.nde.NeuralDE.wrap_nvf"><code class="docutils literal notranslate"><span class="pre">NeuralDE.wrap_nvf()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#torchnldm.model.nde.NeuralODE"><code class="docutils literal notranslate"><span class="pre">NeuralODE</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#torchnldm.model.nde.NeuralODE.forward"><code class="docutils literal notranslate"><span class="pre">NeuralODE.forward()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#torchnldm.model.nde.NeuralSDE"><code class="docutils literal notranslate"><span class="pre">NeuralSDE</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#torchnldm.model.nde.NeuralSDE.forward"><code class="docutils literal notranslate"><span class="pre">NeuralSDE.forward()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#torchnldm.model.nde.NeuralVectorField"><code class="docutils literal notranslate"><span class="pre">NeuralVectorField</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#torchnldm.model.nde.NeuralVectorField.forward"><code class="docutils literal notranslate"><span class="pre">NeuralVectorField.forward()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-torchnldm.model.nldm">torchnldm.model.nldm module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#torchnldm.model.nldm.NLDF"><code class="docutils literal notranslate"><span class="pre">NLDF</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#torchnldm.model.nldm.NLDF.forward"><code class="docutils literal notranslate"><span class="pre">NLDF.forward()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#torchnldm.model.nldm.NLDF.get_batch_loss"><code class="docutils literal notranslate"><span class="pre">NLDF.get_batch_loss()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#torchnldm.model.nldm.NLDF.loss"><code class="docutils literal notranslate"><span class="pre">NLDF.loss()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#torchnldm.model.nldm.NLDF.loss_criterion"><code class="docutils literal notranslate"><span class="pre">NLDF.loss_criterion()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#torchnldm.model.nldm.NLDF.postprocess"><code class="docutils literal notranslate"><span class="pre">NLDF.postprocess()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#torchnldm.model.nldm.NLDF.predict_trajectory"><code class="docutils literal notranslate"><span class="pre">NLDF.predict_trajectory()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#torchnldm.model.nldm.NLDF.preprocess"><code class="docutils literal notranslate"><span class="pre">NLDF.preprocess()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#torchnldm.model.nldm.NLDFConfig"><code class="docutils literal notranslate"><span class="pre">NLDFConfig</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#torchnldm.model.nldm.NLDFConfig.Np"><code class="docutils literal notranslate"><span class="pre">NLDFConfig.Np</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#torchnldm.model.nldm.NLDFConfig.ae_activation"><code class="docutils literal notranslate"><span class="pre">NLDFConfig.ae_activation</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#torchnldm.model.nldm.NLDFConfig.d"><code class="docutils literal notranslate"><span class="pre">NLDFConfig.d</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#torchnldm.model.nldm.NLDFConfig.decoder_architecture"><code class="docutils literal notranslate"><span class="pre">NLDFConfig.decoder_architecture</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#torchnldm.model.nldm.NLDFConfig.decoder_depth"><code class="docutils literal notranslate"><span class="pre">NLDFConfig.decoder_depth</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#torchnldm.model.nldm.NLDFConfig.decoder_hidden_dim"><code class="docutils literal notranslate"><span class="pre">NLDFConfig.decoder_hidden_dim</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#torchnldm.model.nldm.NLDFConfig.device"><code class="docutils literal notranslate"><span class="pre">NLDFConfig.device</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#torchnldm.model.nldm.NLDFConfig.encoder_architecture"><code class="docutils literal notranslate"><span class="pre">NLDFConfig.encoder_architecture</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#torchnldm.model.nldm.NLDFConfig.encoder_depth"><code class="docutils literal notranslate"><span class="pre">NLDFConfig.encoder_depth</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#torchnldm.model.nldm.NLDFConfig.encoder_hidden_dim"><code class="docutils literal notranslate"><span class="pre">NLDFConfig.encoder_hidden_dim</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#torchnldm.model.nldm.NLDFConfig.latent_dim"><code class="docutils literal notranslate"><span class="pre">NLDFConfig.latent_dim</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#torchnldm.model.nldm.NLDFConfig.n"><code class="docutils literal notranslate"><span class="pre">NLDFConfig.n</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#torchnldm.model.nldm.NLDFConfig.nde_activation"><code class="docutils literal notranslate"><span class="pre">NLDFConfig.nde_activation</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#torchnldm.model.nldm.NLDFConfig.nde_adjoint"><code class="docutils literal notranslate"><span class="pre">NLDFConfig.nde_adjoint</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#torchnldm.model.nldm.NLDFConfig.nde_depth"><code class="docutils literal notranslate"><span class="pre">NLDFConfig.nde_depth</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#torchnldm.model.nldm.NLDFConfig.nde_hidden_dim"><code class="docutils literal notranslate"><span class="pre">NLDFConfig.nde_hidden_dim</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#torchnldm.model.nldm.NLDFConfig.nde_integration_method"><code class="docutils literal notranslate"><span class="pre">NLDFConfig.nde_integration_method</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#torchnldm.model.nldm.NLDFConfig.nde_type"><code class="docutils literal notranslate"><span class="pre">NLDFConfig.nde_type</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#torchnldm.model.nldm.NLDM"><code class="docutils literal notranslate"><span class="pre">NLDM</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#torchnldm.model.nldm.NLDM.POD_layer"><code class="docutils literal notranslate"><span class="pre">NLDM.POD_layer()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#torchnldm.model.nldm.NLDM.add_POD_layer"><code class="docutils literal notranslate"><span class="pre">NLDM.add_POD_layer()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#torchnldm.model.nldm.NLDM.forward"><code class="docutils literal notranslate"><span class="pre">NLDM.forward()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#torchnldm.model.nldm.NLDM.get_batch_loss"><code class="docutils literal notranslate"><span class="pre">NLDM.get_batch_loss()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#torchnldm.model.nldm.NLDM.loss"><code class="docutils literal notranslate"><span class="pre">NLDM.loss()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#torchnldm.model.nldm.NLDM.loss_criterion"><code class="docutils literal notranslate"><span class="pre">NLDM.loss_criterion()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#torchnldm.model.nldm.NLDM.postprocess"><code class="docutils literal notranslate"><span class="pre">NLDM.postprocess()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#torchnldm.model.nldm.NLDM.predict_trajectory"><code class="docutils literal notranslate"><span class="pre">NLDM.predict_trajectory()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#torchnldm.model.nldm.NLDM.preprocess"><code class="docutils literal notranslate"><span class="pre">NLDM.preprocess()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#torchnldm.model.nldm.NLDMBase"><code class="docutils literal notranslate"><span class="pre">NLDMBase</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#torchnldm.model.nldm.NLDMBase.adjoint"><code class="docutils literal notranslate"><span class="pre">NLDMBase.adjoint</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#torchnldm.model.nldm.NLDMBase.bidirectional"><code class="docutils literal notranslate"><span class="pre">NLDMBase.bidirectional</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#torchnldm.model.nldm.NLDMBase.evaluate"><code class="docutils literal notranslate"><span class="pre">NLDMBase.evaluate()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#torchnldm.model.nldm.NLDMBase.forward"><code class="docutils literal notranslate"><span class="pre">NLDMBase.forward()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#torchnldm.model.nldm.NLDMBase.get_batch_loss"><code class="docutils literal notranslate"><span class="pre">NLDMBase.get_batch_loss()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#torchnldm.model.nldm.NLDMBase.latent_guidance"><code class="docutils literal notranslate"><span class="pre">NLDMBase.latent_guidance</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#torchnldm.model.nldm.NLDMBase.load_model_from_checkpoint"><code class="docutils literal notranslate"><span class="pre">NLDMBase.load_model_from_checkpoint()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#torchnldm.model.nldm.NLDMBase.load_scaler_from_checkpoint"><code class="docutils literal notranslate"><span class="pre">NLDMBase.load_scaler_from_checkpoint()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#torchnldm.model.nldm.NLDMBase.load_scaler_from_dataset"><code class="docutils literal notranslate"><span class="pre">NLDMBase.load_scaler_from_dataset()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#torchnldm.model.nldm.NLDMBase.loss"><code class="docutils literal notranslate"><span class="pre">NLDMBase.loss()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#torchnldm.model.nldm.NLDMBase.loss_criterion"><code class="docutils literal notranslate"><span class="pre">NLDMBase.loss_criterion()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#torchnldm.model.nldm.NLDMBase.nde_adjoint"><code class="docutils literal notranslate"><span class="pre">NLDMBase.nde_adjoint</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#torchnldm.model.nldm.NLDMBase.nde_integration_method"><code class="docutils literal notranslate"><span class="pre">NLDMBase.nde_integration_method</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#torchnldm.model.nldm.NLDMBase.predict_trajectory"><code class="docutils literal notranslate"><span class="pre">NLDMBase.predict_trajectory()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#torchnldm.model.nldm.NLDMBase.summary"><code class="docutils literal notranslate"><span class="pre">NLDMBase.summary()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#torchnldm.model.nldm.NLDMBase.training_epoch"><code class="docutils literal notranslate"><span class="pre">NLDMBase.training_epoch()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#torchnldm.model.nldm.NLDMBase.validation_epoch"><code class="docutils literal notranslate"><span class="pre">NLDMBase.validation_epoch()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#torchnldm.model.nldm.NLDMConfig"><code class="docutils literal notranslate"><span class="pre">NLDMConfig</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#torchnldm.model.nldm.NLDMConfig.Nh"><code class="docutils literal notranslate"><span class="pre">NLDMConfig.Nh</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#torchnldm.model.nldm.NLDMConfig.Np"><code class="docutils literal notranslate"><span class="pre">NLDMConfig.Np</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#torchnldm.model.nldm.NLDMConfig.ae_activation"><code class="docutils literal notranslate"><span class="pre">NLDMConfig.ae_activation</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#torchnldm.model.nldm.NLDMConfig.ae_conv_dim"><code class="docutils literal notranslate"><span class="pre">NLDMConfig.ae_conv_dim</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#torchnldm.model.nldm.NLDMConfig.ae_residual_blocks"><code class="docutils literal notranslate"><span class="pre">NLDMConfig.ae_residual_blocks</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#torchnldm.model.nldm.NLDMConfig.decoder_conv_depth"><code class="docutils literal notranslate"><span class="pre">NLDMConfig.decoder_conv_depth</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#torchnldm.model.nldm.NLDMConfig.decoder_conv_hidden_channels"><code class="docutils literal notranslate"><span class="pre">NLDMConfig.decoder_conv_hidden_channels</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#torchnldm.model.nldm.NLDMConfig.decoder_mlp_state_hidden_dim"><code class="docutils literal notranslate"><span class="pre">NLDMConfig.decoder_mlp_state_hidden_dim</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#torchnldm.model.nldm.NLDMConfig.decoder_reshape_dim"><code class="docutils literal notranslate"><span class="pre">NLDMConfig.decoder_reshape_dim</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#torchnldm.model.nldm.NLDMConfig.device"><code class="docutils literal notranslate"><span class="pre">NLDMConfig.device</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#torchnldm.model.nldm.NLDMConfig.encoder_conv_depth"><code class="docutils literal notranslate"><span class="pre">NLDMConfig.encoder_conv_depth</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#torchnldm.model.nldm.NLDMConfig.encoder_conv_hidden_channels"><code class="docutils literal notranslate"><span class="pre">NLDMConfig.encoder_conv_hidden_channels</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#torchnldm.model.nldm.NLDMConfig.encoder_mlp_param_depth"><code class="docutils literal notranslate"><span class="pre">NLDMConfig.encoder_mlp_param_depth</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#torchnldm.model.nldm.NLDMConfig.encoder_mlp_param_hidden_dim"><code class="docutils literal notranslate"><span class="pre">NLDMConfig.encoder_mlp_param_hidden_dim</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#torchnldm.model.nldm.NLDMConfig.encoder_mlp_state_hidden_dim"><code class="docutils literal notranslate"><span class="pre">NLDMConfig.encoder_mlp_state_hidden_dim</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#torchnldm.model.nldm.NLDMConfig.encoder_mlp_time_depth"><code class="docutils literal notranslate"><span class="pre">NLDMConfig.encoder_mlp_time_depth</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#torchnldm.model.nldm.NLDMConfig.encoder_mlp_time_hidden_dim"><code class="docutils literal notranslate"><span class="pre">NLDMConfig.encoder_mlp_time_hidden_dim</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#torchnldm.model.nldm.NLDMConfig.encoder_param_emb"><code class="docutils literal notranslate"><span class="pre">NLDMConfig.encoder_param_emb</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#torchnldm.model.nldm.NLDMConfig.encoder_reshape_dim"><code class="docutils literal notranslate"><span class="pre">NLDMConfig.encoder_reshape_dim</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#torchnldm.model.nldm.NLDMConfig.latent_dim"><code class="docutils literal notranslate"><span class="pre">NLDMConfig.latent_dim</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#torchnldm.model.nldm.NLDMConfig.nde_activation"><code class="docutils literal notranslate"><span class="pre">NLDMConfig.nde_activation</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#torchnldm.model.nldm.NLDMConfig.nde_adjoint"><code class="docutils literal notranslate"><span class="pre">NLDMConfig.nde_adjoint</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#torchnldm.model.nldm.NLDMConfig.nde_depth"><code class="docutils literal notranslate"><span class="pre">NLDMConfig.nde_depth</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#torchnldm.model.nldm.NLDMConfig.nde_hidden_dim"><code class="docutils literal notranslate"><span class="pre">NLDMConfig.nde_hidden_dim</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#torchnldm.model.nldm.NLDMConfig.nde_integration_method"><code class="docutils literal notranslate"><span class="pre">NLDMConfig.nde_integration_method</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#torchnldm.model.nldm.NLDMConfig.nde_type"><code class="docutils literal notranslate"><span class="pre">NLDMConfig.nde_type</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#torchnldm.model.nldm.NLDMConfig.state_channels"><code class="docutils literal notranslate"><span class="pre">NLDMConfig.state_channels</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-torchnldm.model">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="torchnldm.train.html">torchnldm.train package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torchnldm.evaluate.html">torchnldm.evaluate package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torchnldm.utils.html">torchnldm.utils package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">TorchNLDM</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">torchnldm.model package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/torchnldm.model.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="torchnldm-model-package">
+<h1>torchnldm.model package<a class="headerlink" href="#torchnldm-model-package" title="Permalink to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading"></a></h2>
+</section>
+<section id="module-torchnldm.model.ae">
+<span id="torchnldm-model-ae-module"></span><h2>torchnldm.model.ae module<a class="headerlink" href="#module-torchnldm.model.ae" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="torchnldm.model.ae.FieldDecoder">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">torchnldm.model.ae.</span></span><span class="sig-name descname"><span class="pre">FieldDecoder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">latent_dim</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hidden_dim</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">64</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">activation</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'elu'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">architecture</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'hidden_sum'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchnldm/model/ae.html#FieldDecoder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchnldm.model.ae.FieldDecoder" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code></p>
+<p>Field Decoder class.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><dl class="field-list simple">
+<dt class="field-odd">n<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(int), dimension of the continuos state u(x,t;mu).</p>
+</dd>
+<dt class="field-even">Np<span class="colon">:</span></dt>
+<dd class="field-even"><p>(int), dimension of the parameters vector (mu,t), dim=(Nmu + 1).</p>
+</dd>
+<dt class="field-odd">d<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(int), dimension of the spatial domain (n coordinates).</p>
+</dd>
+<dt class="field-even">latent_dim<span class="colon">:</span></dt>
+<dd class="field-even"><p>(int), dimension of the output latent encoding.</p>
+</dd>
+<dt class="field-odd">depth<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(int), number of layers of the MLPs.</p>
+</dd>
+<dt class="field-even">hidden_dim<span class="colon">:</span></dt>
+<dd class="field-even"><p>(int), MLPs’ hidden layers size.</p>
+</dd>
+<dt class="field-odd">activation<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(str), activation of the state and parameter encoders.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="torchnldm.model.ae.FieldDecoder.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">z</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tensor</span></span></span><a class="reference internal" href="_modules/torchnldm/model/ae.html#FieldDecoder.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchnldm.model.ae.FieldDecoder.forward" title="Permalink to this definition"></a></dt>
+<dd><p>Defines the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
+this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="torchnldm.model.ae.FieldEncoder">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">torchnldm.model.ae.</span></span><span class="sig-name descname"><span class="pre">FieldEncoder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Np</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">latent_dim</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hidden_dim</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">64</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">activation</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'elu'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">architecture</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'hidden_sum'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchnldm/model/ae.html#FieldEncoder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchnldm.model.ae.FieldEncoder" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code></p>
+<p>Field Encoder class.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><dl class="field-list simple">
+<dt class="field-odd">n<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(int), dimension of the continuos state u(x,t;mu).</p>
+</dd>
+<dt class="field-even">Np<span class="colon">:</span></dt>
+<dd class="field-even"><p>(int), dimension of the parameters vector (mu,t), dim=(Nmu + 1).</p>
+</dd>
+<dt class="field-odd">d<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(int), dimension of the spatial domain (n coordinates).</p>
+</dd>
+<dt class="field-even">latent_dim<span class="colon">:</span></dt>
+<dd class="field-even"><p>(int), dimension of the output latent encoding.</p>
+</dd>
+<dt class="field-odd">depth<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(int), number of layers of the MLPs.</p>
+</dd>
+<dt class="field-even">hidden_dim<span class="colon">:</span></dt>
+<dd class="field-even"><p>(int), MLPs’ hidden layers size.</p>
+</dd>
+<dt class="field-odd">activation<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(str), activation of the state and parameter encoders.</p>
+</dd>
+<dt class="field-even">architecture<span class="colon">:</span></dt>
+<dd class="field-even"><p>(str), defines the network architecture</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="torchnldm.model.ae.FieldEncoder.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mut</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tensor</span></span></span><a class="reference internal" href="_modules/torchnldm/model/ae.html#FieldEncoder.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchnldm.model.ae.FieldEncoder.forward" title="Permalink to this definition"></a></dt>
+<dd><p>Defines the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
+this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="torchnldm.model.ae.StateDecoder">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">torchnldm.model.ae.</span></span><span class="sig-name descname"><span class="pre">StateDecoder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Nh</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">latent_dim</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">conv_dim</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">conv_depth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_channels</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hidden_channels</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reshape_dim</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">residual_blocks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mlp_hidden_dim</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">activation</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'elu'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchnldm/model/ae.html#StateDecoder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchnldm.model.ae.StateDecoder" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code></p>
+<p>State decoder for decoding a sequence of latent encodings z(t0;mu),…,z(tf;mu) into the high dimensional
+spatially-discretized states uh(t0;mu),…,uh(tf;mu).
+Consists of an input MLP, producing an intermediate representation, which is then reshaped and processed 
+by a feed-forward convolutional architecture, possibly equipped with residual connections.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><dl class="field-list simple">
+<dt class="field-odd">Nh<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(int), dimension of the output spatially discretized state uh(t;mu).</p>
+</dd>
+<dt class="field-even">latent_dim<span class="colon">:</span></dt>
+<dd class="field-even"><p>(int), dimension of the input latent encodings z(t;mu).</p>
+</dd>
+<dt class="field-odd">conv_dim<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(int), dimensionality of the emlpoyed convolutions (1d,2d).</p>
+</dd>
+<dt class="field-even">conv_depth<span class="colon">:</span></dt>
+<dd class="field-even"><p>(int), number of convolutional layers (or blocks) in the state decoder.</p>
+</dd>
+<dt class="field-odd">out_channels<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(int), number of output channels of the decoded state.</p>
+</dd>
+<dt class="field-even">hidden_channels<span class="colon">:</span></dt>
+<dd class="field-even"><p>(int), number of channels produced by the first convolutional layer (or block).</p>
+</dd>
+<dt class="field-odd">reshape_dim<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(int), intermediate reshape dimension to pass from the MLP representation to the convolutional one.</p>
+</dd>
+<dt class="field-even">residual_blocks<span class="colon">:</span></dt>
+<dd class="field-even"><p>(bool), if True blocks with two convolutional layers equipped with skip connections are used, instead of single convolutional layers.</p>
+</dd>
+<dt class="field-odd">mlp_hidden_dim<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(int), dimensionality of the MLP hidden layers.</p>
+</dd>
+<dt class="field-even">activation<span class="colon">:</span></dt>
+<dd class="field-even"><p>(str), activation of the input MLP and the convolutional network.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="torchnldm.model.ae.StateDecoder.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">z</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tensor</span></span></span><a class="reference internal" href="_modules/torchnldm/model/ae.html#StateDecoder.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchnldm.model.ae.StateDecoder.forward" title="Permalink to this definition"></a></dt>
+<dd><p>Defines the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
+this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="torchnldm.model.ae.StateEncoder">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">torchnldm.model.ae.</span></span><span class="sig-name descname"><span class="pre">StateEncoder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Nh</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Np</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">latent_dim</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">conv_dim</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">conv_depth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">in_channels</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hidden_channels</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reshape_dim</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">residual_blocks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mlp_state_hidden_dim</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">256</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param_emb</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'multiply'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mlp_param_depth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mlp_param_hidden_dim</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">256</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mlp_time_depth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mlp_time_hidden_dim</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">256</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">activation</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'elu'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchnldm/model/ae.html#StateEncoder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchnldm.model.ae.StateEncoder" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code></p>
+<p>State encoder for producing an embedding of the spatially-discretized state uh(t).
+Consists of a feed-forward convolutional architecture, possibly equipped with residual connections.
+For the parameterized version consider using the PStateEncoder class.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><dl class="field-list simple">
+<dt class="field-odd">Nh<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(int), number of degrees of freedom of the spatially discretized state uh(t).</p>
+</dd>
+<dt class="field-even">Np<span class="colon">:</span></dt>
+<dd class="field-even"><p>(int), number of parameters (Nmu) + 1.</p>
+</dd>
+<dt class="field-odd">latent_dim<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(int), dimension of the latent state z(t).</p>
+</dd>
+<dt class="field-even">conv_dim<span class="colon">:</span></dt>
+<dd class="field-even"><p>(int), dimensionality of the emlpoyed convolutions (1d,2d).</p>
+</dd>
+<dt class="field-odd">conv_depth<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(int), number of convolutional layers (or blocks) in the state decoder.</p>
+</dd>
+<dt class="field-even">in_channels<span class="colon">:</span></dt>
+<dd class="field-even"><p>(int), number of channels of the input state.</p>
+</dd>
+<dt class="field-odd">hidden_channels<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(int), number of output channels produced by the first convolutional layer (or block).</p>
+</dd>
+<dt class="field-even">reshape_dim<span class="colon">:</span></dt>
+<dd class="field-even"><p>(int), to be specified when applying Conv2d to 1d vectors of size <cite>Nh</cite>, so reshape_dim must be <cite>int(sqrt(Nh))</cite>.</p>
+</dd>
+<dt class="field-odd">residual_blocks<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(bool), if True blocks with two convolutional layers equipped with skip connections are used, instead of single convolutional layers.</p>
+</dd>
+<dt class="field-even">mlp_state_hidden_dim<span class="colon">:</span></dt>
+<dd class="field-even"><p>(int), dimensionality of the state-embedding MLP hidden layers.</p>
+</dd>
+<dt class="field-odd">param_emb<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(str), method to combine state and parameters embeddings (‘multiply’, ‘project’, ‘sum’).</p>
+</dd>
+<dt class="field-even">mlp_param_depth<span class="colon">:</span></dt>
+<dd class="field-even"><p>(int), number of hidden layers of the parameters-embedding MLP.</p>
+</dd>
+<dt class="field-odd">mlp_param_hidden_dim<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(int), dimensionality of the parameters-embedding MLP hidden layers.</p>
+</dd>
+<dt class="field-even">mlp_time_depth<span class="colon">:</span></dt>
+<dd class="field-even"><p>(int), number of hidden layers of the time-embedding MLP.</p>
+</dd>
+<dt class="field-odd">mlp_time_hidden_dim<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(int), dimensionality of the time-embedding MLP hidden layers.</p>
+</dd>
+<dt class="field-even">activation<span class="colon">:</span></dt>
+<dd class="field-even"><p>(str), activation of the state and parameter encoders.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p>Architecture:</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="torchnldm.model.ae.StateEncoder.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mut</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tensor</span></span></span><a class="reference internal" href="_modules/torchnldm/model/ae.html#StateEncoder.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchnldm.model.ae.StateEncoder.forward" title="Permalink to this definition"></a></dt>
+<dd><p>Forward method defining the inference scheme of the state encoder module.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-torchnldm.model.nde">
+<span id="torchnldm-model-nde-module"></span><h2>torchnldm.model.nde module<a class="headerlink" href="#module-torchnldm.model.nde" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="torchnldm.model.nde.NeuralDE">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">torchnldm.model.nde.</span></span><span class="sig-name descname"><span class="pre">NeuralDE</span></span><a class="reference internal" href="_modules/torchnldm/model/nde.html#NeuralDE"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchnldm.model.nde.NeuralDE" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code></p>
+<p>Neural Differential Equation abstract base class. It features an abstract forward method that must
+be overridden by the subclasses, and a method for wrapping the neural network module parameterizing 
+the DE dynamics.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="torchnldm.model.nde.NeuralDE.forward">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">z0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">integration_method</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'euler'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">adjoint</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tensor</span></span></span><a class="reference internal" href="_modules/torchnldm/model/nde.html#NeuralDE.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchnldm.model.nde.NeuralDE.forward" title="Permalink to this definition"></a></dt>
+<dd><p>Abstract method to be overridden by subclasses, defining the inference behavior of a neural differential equation (NDE).</p>
+<dl class="simple">
+<dt>Args:</dt><dd><dl class="field-list simple">
+<dt class="field-odd">z0<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(Tensor), initial value.</p>
+</dd>
+<dt class="field-even">t<span class="colon">:</span></dt>
+<dd class="field-even"><p>(Tensor), 1d tensor of timesteps, in order to perform numerical integration.</p>
+</dd>
+<dt class="field-odd">integration_method<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(str), method to be employed for numerical integration.</p>
+</dd>
+<dt class="field-even">adjoint<span class="colon">:</span></dt>
+<dd class="field-even"><p>(bool), flag enabling the adjoint sensitivity method.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="torchnldm.model.nde.NeuralDE.wrap_nvf">
+<span class="sig-name descname"><span class="pre">wrap_nvf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Module</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#torchnldm.model.nde.NeuralVectorField" title="torchnldm.model.nde.NeuralVectorField"><span class="pre">NeuralVectorField</span></a></span></span><a class="reference internal" href="_modules/torchnldm/model/nde.html#NeuralDE.wrap_nvf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchnldm.model.nde.NeuralDE.wrap_nvf" title="Permalink to this definition"></a></dt>
+<dd><p>Method to wrap the module parameterizing the neural vector field.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="torchnldm.model.nde.NeuralODE">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">torchnldm.model.nde.</span></span><span class="sig-name descname"><span class="pre">NeuralODE</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Module</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchnldm/model/nde.html#NeuralODE"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchnldm.model.nde.NeuralODE" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#torchnldm.model.nde.NeuralDE" title="torchnldm.model.nde.NeuralDE"><code class="xref py py-class docutils literal notranslate"><span class="pre">NeuralDE</span></code></a></p>
+<p>Neural Ordinary Differential Equation class. Based upon the TorchDiffEq package for integration.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><dl class="field-list simple">
+<dt class="field-odd">f<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(nn.Module, MLP, NeuralVectorField), neural network parameterizing the vector field.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="torchnldm.model.nde.NeuralODE.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">z0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">integration_method</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'euler'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">adjoint</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tensor</span></span></span><a class="reference internal" href="_modules/torchnldm/model/nde.html#NeuralODE.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchnldm.model.nde.NeuralODE.forward" title="Permalink to this definition"></a></dt>
+<dd><p>Abstract method to be overridden by subclasses, defining the inference behavior of a neural differential equation (NDE).</p>
+<dl class="simple">
+<dt>Args:</dt><dd><dl class="field-list simple">
+<dt class="field-odd">z0<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(Tensor), initial value.</p>
+</dd>
+<dt class="field-even">t<span class="colon">:</span></dt>
+<dd class="field-even"><p>(Tensor), 1d tensor of timesteps, in order to perform numerical integration.</p>
+</dd>
+<dt class="field-odd">integration_method<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(str), method to be employed for numerical integration.</p>
+</dd>
+<dt class="field-even">adjoint<span class="colon">:</span></dt>
+<dd class="field-even"><p>(bool), flag enabling the adjoint sensitivity method.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="torchnldm.model.nde.NeuralSDE">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">torchnldm.model.nde.</span></span><span class="sig-name descname"><span class="pre">NeuralSDE</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mu</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Module</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Module</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchnldm/model/nde.html#NeuralSDE"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchnldm.model.nde.NeuralSDE" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#torchnldm.model.nde.NeuralDE" title="torchnldm.model.nde.NeuralDE"><code class="xref py py-class docutils literal notranslate"><span class="pre">NeuralDE</span></code></a></p>
+<p>Neural Stochastic Differential Equation class. Based upon the TorchSDE package for integration.
+Implements an Ito SDE, with diagonal noise.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><dl class="field-list simple">
+<dt class="field-odd">mu<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(nn.Module, MLP, NeuralVectorField), neural network parameterizing the drift term.</p>
+</dd>
+<dt class="field-even">sigma<span class="colon">:</span></dt>
+<dd class="field-even"><p>(nn.Module, MLP, NeuralVectorField), neural network parameterizing the diffusion term.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="torchnldm.model.nde.NeuralSDE.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">z0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">integration_method</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'euler'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">adjoint</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tensor</span></span></span><a class="reference internal" href="_modules/torchnldm/model/nde.html#NeuralSDE.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchnldm.model.nde.NeuralSDE.forward" title="Permalink to this definition"></a></dt>
+<dd><p>Abstract method to be overridden by subclasses, defining the inference behavior of a neural differential equation (NDE).</p>
+<dl class="simple">
+<dt>Args:</dt><dd><dl class="field-list simple">
+<dt class="field-odd">z0<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(Tensor), initial value.</p>
+</dd>
+<dt class="field-even">t<span class="colon">:</span></dt>
+<dd class="field-even"><p>(Tensor), 1d tensor of timesteps, in order to perform numerical integration.</p>
+</dd>
+<dt class="field-odd">integration_method<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(str), method to be employed for numerical integration.</p>
+</dd>
+<dt class="field-even">adjoint<span class="colon">:</span></dt>
+<dd class="field-even"><p>(bool), flag enabling the adjoint sensitivity method.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="torchnldm.model.nde.NeuralVectorField">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">torchnldm.model.nde.</span></span><span class="sig-name descname"><span class="pre">NeuralVectorField</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Module</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchnldm/model/nde.html#NeuralVectorField"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchnldm.model.nde.NeuralVectorField" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code></p>
+<p>Neural Vector Field class, intended to be used with Neural Differential Equations (NeuralDE) classes.
+It wraps a neural network module (nn.Module), by defining a forward method with implicit time dependence, 
+leading to an autonomous NeuralDE formulation.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><dl class="field-list simple">
+<dt class="field-odd">f<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(nn.Module), neural network parameterizing the vector field.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="torchnldm.model.nde.NeuralVectorField.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tensor</span></span></span><a class="reference internal" href="_modules/torchnldm/model/nde.html#NeuralVectorField.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchnldm.model.nde.NeuralVectorField.forward" title="Permalink to this definition"></a></dt>
+<dd><p>Defines the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
+this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-torchnldm.model.nldm">
+<span id="torchnldm-model-nldm-module"></span><h2>torchnldm.model.nldm module<a class="headerlink" href="#module-torchnldm.model.nldm" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="torchnldm.model.nldm.NLDF">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">torchnldm.model.nldm.</span></span><span class="sig-name descname"><span class="pre">NLDF</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#torchnldm.model.nldm.NLDFConfig" title="torchnldm.model.nldm.NLDFConfig"><span class="pre">NLDFConfig</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchnldm/model/nldm.html#NLDF"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchnldm.model.nldm.NLDF" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#torchnldm.model.nldm.NLDMBase" title="torchnldm.model.nldm.NLDMBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">NLDMBase</span></code></a></p>
+<p>NLDF class (Spatially-continuous NLDM).</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>config (NLDFConfig): NLDF configuration class.</p>
+</dd>
+<dt>Attributes:</dt><dd><p>n (int): dimension u(x,t;mu) codomain.
+d (int): dimension of spatial domain (x).
+Np (int): total number of parameters + time (Nmu + 1)
+latent_dim (int): dimension of the latent state z(t).
+nde_type (str): type of latent neural differential equation (ode/sde)
+encoder (FieldEncoder): maps u0 –&gt; z0.
+decoder (Decoder): maps zt –&gt; ut.
+latent_nde (NeuralDE): evolves z0 ~~&gt; zt.
+integration_method (std): numerical scheme used for the latent NDE time-integration.
+adjoint (bool): flag for enabling the adjoint method (<a class="reference external" href="https://arxiv.org/abs/1806.07366">https://arxiv.org/abs/1806.07366</a>) 
+device (torch.device): cpu/gpu(cuda)</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="torchnldm.model.nldm.NLDF.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mut0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_latent</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">preprocess</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">postprocess</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tensor</span></span></span><a class="reference internal" href="_modules/torchnldm/model/nldm.html#NLDF.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchnldm.model.nldm.NLDF.forward" title="Permalink to this definition"></a></dt>
+<dd><p>Forward method defining the inference behavior of the NLDF.</p>
+<dl class="simple">
+<dt>Args: </dt><dd><dl class="field-list simple">
+<dt class="field-odd">u0<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(Tensor): discretized state initial value, of shape = (B,M,n).</p>
+</dd>
+<dt class="field-even">mut0<span class="colon">:</span></dt>
+<dd class="field-even"><p>(Tensor): parameters tensor, concatenated with the initial timestep (as provided by PDEGen), of shape = (B,M,Np).</p>
+</dd>
+<dt class="field-odd">x<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(Tensor): nodes coordinates tensor of shape = (B,M,d).</p>
+</dd>
+<dt class="field-even">t<span class="colon">:</span></dt>
+<dd class="field-even"><p>(Tensor): 1d tensor of timesteps to perform latent integration, of shape (T,).</p>
+</dd>
+<dt class="field-odd">return_latent<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(bool): flag to return the latent dynamics z(t), evalued at the timesteps t.</p>
+</dd>
+<dt class="field-even">preprocess<span class="colon">:</span></dt>
+<dd class="field-even"><p>(bool): flag to perform input features scaling.</p>
+</dd>
+<dt class="field-odd">postprocess<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(bool): flag to perform output scaling.</p>
+</dd>
+</dl>
+</dd>
+<dt>Returns:</dt><dd><dl class="field-list simple">
+<dt class="field-odd">ut<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(Tensor): evolution of the high-dimensional state, of shape shape = (T,B,Nh).</p>
+</dd>
+<dt class="field-even">zt<span class="colon">:</span></dt>
+<dd class="field-even"><p>(Tensor): evolution of the latent state,  of shape shape = (T,B,latent_dim).</p>
+</dd>
+</dl>
+</dd>
+<dt>Shapes:</dt><dd><ul class="simple">
+<li><p>B: batch size (params)</p></li>
+<li><p>M: batch size (nodes coordinates)</p></li>
+<li><p>n: dim of u’s codomain</p></li>
+<li><p>d: dim of u’s spatial-domain</p></li>
+<li><p>T: number of timesteps involved in the prediction (length of the prediction window)</p></li>
+<li><p>latent_dim: dimension of the latent state vector</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="torchnldm.model.nldm.NLDF.get_batch_loss">
+<span class="sig-name descname"><span class="pre">get_batch_loss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="torchnldm.data.html#torchnldm.data.dataloader.DataLoader" title="torchnldm.data.dataloader.DataLoader"><span class="pre">DataLoader</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">section_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t0_index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_sizes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tensor</span></span></span><a class="reference internal" href="_modules/torchnldm/model/nldm.html#NLDF.get_batch_loss"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchnldm.model.nldm.NLDF.get_batch_loss" title="Permalink to this definition"></a></dt>
+<dd><p>Abstract method, must be overridden by subclasses, implementing the batched loss computation.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="torchnldm.model.nldm.NLDF.loss">
+<span class="sig-name descname"><span class="pre">loss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mut0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ut</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mut</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tensor</span></span></span><a class="reference internal" href="_modules/torchnldm/model/nldm.html#NLDF.loss"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchnldm.model.nldm.NLDF.loss" title="Permalink to this definition"></a></dt>
+<dd><p>Abstract method, must be overridden by subclasses, implementing the loss computation algorithm used in the training routine.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="torchnldm.model.nldm.NLDF.loss_criterion">
+<span class="sig-name descname"><span class="pre">loss_criterion</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ut</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ut_pred</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tensor</span></span></span><a class="reference internal" href="_modules/torchnldm/model/nldm.html#NLDF.loss_criterion"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchnldm.model.nldm.NLDF.loss_criterion" title="Permalink to this definition"></a></dt>
+<dd><p>Abstract method, must be overridden by subclasses, defining the loss criterion for the loss computation.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="torchnldm.model.nldm.NLDF.postprocess">
+<span class="sig-name descname"><span class="pre">postprocess</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ut</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tensor</span></span></span><a class="reference internal" href="_modules/torchnldm/model/nldm.html#NLDF.postprocess"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchnldm.model.nldm.NLDF.postprocess" title="Permalink to this definition"></a></dt>
+<dd><p>Performs postprocessing via the models’ DataScaler, over the models’ output.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="torchnldm.model.nldm.NLDF.predict_trajectory">
+<span class="sig-name descname"><span class="pre">predict_trajectory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="torchnldm.data.html#torchnldm.data.dataloader.DataLoader" title="torchnldm.data.dataloader.DataLoader"><span class="pre">DataLoader</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">t0_index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param_index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timesteps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">enable_scaling</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_inputs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">torch.Tensor</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/torchnldm/model/nldm.html#NLDF.predict_trajectory"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchnldm.model.nldm.NLDF.predict_trajectory" title="Permalink to this definition"></a></dt>
+<dd><p>Abstract method, must be overridden by subclasses, implementing the single trajectory prediction steps.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="torchnldm.model.nldm.NLDF.preprocess">
+<span class="sig-name descname"><span class="pre">preprocess</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mut0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">torch.Tensor</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/torchnldm/model/nldm.html#NLDF.preprocess"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchnldm.model.nldm.NLDF.preprocess" title="Permalink to this definition"></a></dt>
+<dd><p>Performs preprocessing via the models’ DataScaler, over the input features.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="torchnldm.model.nldm.NLDFConfig">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">torchnldm.model.nldm.</span></span><span class="sig-name descname"><span class="pre">NLDFConfig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Np</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">latent_dim</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ae_activation</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'elu'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoder_depth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoder_hidden_dim</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">256</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoder_architecture</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'hadamard'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">decoder_depth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">decoder_hidden_dim</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">256</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">decoder_architecture</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'hadamard'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nde_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'ode'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nde_depth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nde_hidden_dim</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">256</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nde_activation</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'elu'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nde_integration_method</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'euler'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nde_adjoint</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">device</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">device(type='cpu')</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchnldm/model/nldm.html#NLDFConfig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchnldm.model.nldm.NLDFConfig" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="torchnldm.utils.html#torchnldm.utils.config.ConfigBase" title="torchnldm.utils.config.ConfigBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">ConfigBase</span></code></a></p>
+<p>Neural Latent Dynamics Field configuration class.</p>
+<dl class="simple">
+<dt>Attributes:</dt><dd><dl class="field-list simple">
+<dt class="field-odd">n<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(int): dimension u(x,t;mu) codomain.</p>
+</dd>
+<dt class="field-even">d<span class="colon">:</span></dt>
+<dd class="field-even"><p>(int): number of dimension of spatial domain (x).</p>
+</dd>
+<dt class="field-odd">Np<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(int): total number of parameters + time (Nmu + 1)</p>
+</dd>
+<dt class="field-even">latent_dim<span class="colon">:</span></dt>
+<dd class="field-even"><p>(int): dimension of the latent state z(t).</p>
+</dd>
+<dt class="field-odd">nde_type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(str): type of latent neural differential equation (ode/sde)</p>
+</dd>
+<dt class="field-even">integration_method<span class="colon">:</span></dt>
+<dd class="field-even"><p>(std): numerical scheme used for the latent NDE time-integration.</p>
+</dd>
+<dt class="field-odd">adjoint<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(bool): flag for enabling the adjoint method (<a class="reference external" href="https://arxiv.org/abs/1806.07366">https://arxiv.org/abs/1806.07366</a>)</p>
+</dd>
+<dt class="field-even">device<span class="colon">:</span></dt>
+<dd class="field-even"><p>(torch.device): cpu/gpu(cuda)</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="torchnldm.model.nldm.NLDFConfig.Np">
+<span class="sig-name descname"><span class="pre">Np</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#torchnldm.model.nldm.NLDFConfig.Np" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="torchnldm.model.nldm.NLDFConfig.ae_activation">
+<span class="sig-name descname"><span class="pre">ae_activation</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'elu'</span></em><a class="headerlink" href="#torchnldm.model.nldm.NLDFConfig.ae_activation" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="torchnldm.model.nldm.NLDFConfig.d">
+<span class="sig-name descname"><span class="pre">d</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#torchnldm.model.nldm.NLDFConfig.d" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="torchnldm.model.nldm.NLDFConfig.decoder_architecture">
+<span class="sig-name descname"><span class="pre">decoder_architecture</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'hadamard'</span></em><a class="headerlink" href="#torchnldm.model.nldm.NLDFConfig.decoder_architecture" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="torchnldm.model.nldm.NLDFConfig.decoder_depth">
+<span class="sig-name descname"><span class="pre">decoder_depth</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3</span></em><a class="headerlink" href="#torchnldm.model.nldm.NLDFConfig.decoder_depth" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="torchnldm.model.nldm.NLDFConfig.decoder_hidden_dim">
+<span class="sig-name descname"><span class="pre">decoder_hidden_dim</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">256</span></em><a class="headerlink" href="#torchnldm.model.nldm.NLDFConfig.decoder_hidden_dim" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="torchnldm.model.nldm.NLDFConfig.device">
+<span class="sig-name descname"><span class="pre">device</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">device</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">device(type='cpu')</span></em><a class="headerlink" href="#torchnldm.model.nldm.NLDFConfig.device" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="torchnldm.model.nldm.NLDFConfig.encoder_architecture">
+<span class="sig-name descname"><span class="pre">encoder_architecture</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'hadamard'</span></em><a class="headerlink" href="#torchnldm.model.nldm.NLDFConfig.encoder_architecture" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="torchnldm.model.nldm.NLDFConfig.encoder_depth">
+<span class="sig-name descname"><span class="pre">encoder_depth</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3</span></em><a class="headerlink" href="#torchnldm.model.nldm.NLDFConfig.encoder_depth" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="torchnldm.model.nldm.NLDFConfig.encoder_hidden_dim">
+<span class="sig-name descname"><span class="pre">encoder_hidden_dim</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">256</span></em><a class="headerlink" href="#torchnldm.model.nldm.NLDFConfig.encoder_hidden_dim" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="torchnldm.model.nldm.NLDFConfig.latent_dim">
+<span class="sig-name descname"><span class="pre">latent_dim</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#torchnldm.model.nldm.NLDFConfig.latent_dim" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="torchnldm.model.nldm.NLDFConfig.n">
+<span class="sig-name descname"><span class="pre">n</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#torchnldm.model.nldm.NLDFConfig.n" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="torchnldm.model.nldm.NLDFConfig.nde_activation">
+<span class="sig-name descname"><span class="pre">nde_activation</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'elu'</span></em><a class="headerlink" href="#torchnldm.model.nldm.NLDFConfig.nde_activation" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="torchnldm.model.nldm.NLDFConfig.nde_adjoint">
+<span class="sig-name descname"><span class="pre">nde_adjoint</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#torchnldm.model.nldm.NLDFConfig.nde_adjoint" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="torchnldm.model.nldm.NLDFConfig.nde_depth">
+<span class="sig-name descname"><span class="pre">nde_depth</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2</span></em><a class="headerlink" href="#torchnldm.model.nldm.NLDFConfig.nde_depth" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="torchnldm.model.nldm.NLDFConfig.nde_hidden_dim">
+<span class="sig-name descname"><span class="pre">nde_hidden_dim</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">256</span></em><a class="headerlink" href="#torchnldm.model.nldm.NLDFConfig.nde_hidden_dim" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="torchnldm.model.nldm.NLDFConfig.nde_integration_method">
+<span class="sig-name descname"><span class="pre">nde_integration_method</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'euler'</span></em><a class="headerlink" href="#torchnldm.model.nldm.NLDFConfig.nde_integration_method" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="torchnldm.model.nldm.NLDFConfig.nde_type">
+<span class="sig-name descname"><span class="pre">nde_type</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'ode'</span></em><a class="headerlink" href="#torchnldm.model.nldm.NLDFConfig.nde_type" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="torchnldm.model.nldm.NLDM">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">torchnldm.model.nldm.</span></span><span class="sig-name descname"><span class="pre">NLDM</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#torchnldm.model.nldm.NLDMConfig" title="torchnldm.model.nldm.NLDMConfig"><span class="pre">NLDMConfig</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchnldm/model/nldm.html#NLDM"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchnldm.model.nldm.NLDM" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#torchnldm.model.nldm.NLDMBase" title="torchnldm.model.nldm.NLDMBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">NLDMBase</span></code></a></p>
+<p>Class implementing the spatially-discrete NLDM formulation.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><dl class="field-list simple">
+<dt class="field-odd">config<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(NLDMConfig): NLDM configuration class.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="torchnldm.model.nldm.NLDM.POD_layer">
+<span class="sig-name descname"><span class="pre">POD_layer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">position</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'input'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tensor</span></span></span><a class="reference internal" href="_modules/torchnldm/model/nldm.html#NLDM.POD_layer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchnldm.model.nldm.NLDM.POD_layer" title="Permalink to this definition"></a></dt>
+<dd><p>Method for handling the POD layer, to perform forward and inverse projection, depending
+on the provided ‘position’ argument.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><dl class="field-list simple">
+<dt class="field-odd">u<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(Tensor): input to be projected</p>
+</dd>
+<dt class="field-even">position<span class="colon">:</span></dt>
+<dd class="field-even"><p>(str): if ‘input’ it applies U, while if ‘output’ U^T (transposed) is applied.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="torchnldm.model.nldm.NLDM.add_POD_layer">
+<span class="sig-name descname"><span class="pre">add_POD_layer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">U</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/torchnldm/model/nldm.html#NLDM.add_POD_layer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchnldm.model.nldm.NLDM.add_POD_layer" title="Permalink to this definition"></a></dt>
+<dd><p>Method for adding a POD layer, with U its projection matrix, provided as a torch.tensor.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="torchnldm.model.nldm.NLDM.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mut0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_latent</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">preprocess</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">postprocess</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tensor</span></span></span><a class="reference internal" href="_modules/torchnldm/model/nldm.html#NLDM.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchnldm.model.nldm.NLDM.forward" title="Permalink to this definition"></a></dt>
+<dd><p>Forward method defining the inference behavior of the NLDM.</p>
+<dl class="simple">
+<dt>Args: </dt><dd><dl class="field-list simple">
+<dt class="field-odd">u0<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(Tensor): discretized state initial value, of shape = (B,Nh).</p>
+</dd>
+<dt class="field-even">mut0<span class="colon">:</span></dt>
+<dd class="field-even"><p>(Tensor): parameters tensor, concatenated with the initial timestep (as provided by PDEGen), of shape = (B,Np).</p>
+</dd>
+<dt class="field-odd">t<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(Tensor): 1d tensor of timesteps to perform latent integration, of shape (T,).</p>
+</dd>
+<dt class="field-even">return_latent<span class="colon">:</span></dt>
+<dd class="field-even"><p>(bool): flag to return the latent dynamics z(t), evalued at the timesteps t.</p>
+</dd>
+<dt class="field-odd">preprocess<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(bool): flag to perform input features scaling.</p>
+</dd>
+<dt class="field-even">postprocess<span class="colon">:</span></dt>
+<dd class="field-even"><p>(bool): flag to perform output scaling.</p>
+</dd>
+</dl>
+</dd>
+<dt>Returns:</dt><dd><dl class="field-list simple">
+<dt class="field-odd">ut<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(Tensor): evolution of the high-dimensional state, of shape shape = (T,B,Nh).</p>
+</dd>
+<dt class="field-even">zt<span class="colon">:</span></dt>
+<dd class="field-even"><p>(Tensor): evolution of the latent state,  of shape shape = (T,B,latent_dim).</p>
+</dd>
+</dl>
+</dd>
+<dt>Shapes:</dt><dd><ul class="simple">
+<li><p>B: batch size</p></li>
+<li><p>Nh: degrees of freedom of the discretized state</p></li>
+<li><p>T: number of timesteps involved in the prediction (length of the prediction window)</p></li>
+<li><p>latent_dim: dimension of the latent state vector</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="torchnldm.model.nldm.NLDM.get_batch_loss">
+<span class="sig-name descname"><span class="pre">get_batch_loss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="torchnldm.data.html#torchnldm.data.dataloader.DataLoader" title="torchnldm.data.dataloader.DataLoader"><span class="pre">DataLoader</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">section_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t0_index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_sizes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tensor</span></span></span><a class="reference internal" href="_modules/torchnldm/model/nldm.html#NLDM.get_batch_loss"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchnldm.model.nldm.NLDM.get_batch_loss" title="Permalink to this definition"></a></dt>
+<dd><p>Abstract method, must be overridden by subclasses, implementing the batched loss computation.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="torchnldm.model.nldm.NLDM.loss">
+<span class="sig-name descname"><span class="pre">loss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mut0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ut</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mut</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tensor</span></span></span><a class="reference internal" href="_modules/torchnldm/model/nldm.html#NLDM.loss"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchnldm.model.nldm.NLDM.loss" title="Permalink to this definition"></a></dt>
+<dd><p>Abstract method, must be overridden by subclasses, implementing the loss computation algorithm used in the training routine.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="torchnldm.model.nldm.NLDM.loss_criterion">
+<span class="sig-name descname"><span class="pre">loss_criterion</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ut</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ut_pred</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tensor</span></span></span><a class="reference internal" href="_modules/torchnldm/model/nldm.html#NLDM.loss_criterion"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchnldm.model.nldm.NLDM.loss_criterion" title="Permalink to this definition"></a></dt>
+<dd><p>Abstract method, must be overridden by subclasses, defining the loss criterion for the loss computation.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="torchnldm.model.nldm.NLDM.postprocess">
+<span class="sig-name descname"><span class="pre">postprocess</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ut</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tensor</span></span></span><a class="reference internal" href="_modules/torchnldm/model/nldm.html#NLDM.postprocess"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchnldm.model.nldm.NLDM.postprocess" title="Permalink to this definition"></a></dt>
+<dd><p>Performs postprocessing via the models’ DataScaler, over the models’ output.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="torchnldm.model.nldm.NLDM.predict_trajectory">
+<span class="sig-name descname"><span class="pre">predict_trajectory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="torchnldm.data.html#torchnldm.data.dataloader.DataLoader" title="torchnldm.data.dataloader.DataLoader"><span class="pre">DataLoader</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">t0_index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param_index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timesteps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">enable_scaling</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_inputs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">torch.Tensor</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/torchnldm/model/nldm.html#NLDM.predict_trajectory"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchnldm.model.nldm.NLDM.predict_trajectory" title="Permalink to this definition"></a></dt>
+<dd><p>Abstract method, must be overridden by subclasses, implementing the single trajectory prediction steps.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="torchnldm.model.nldm.NLDM.preprocess">
+<span class="sig-name descname"><span class="pre">preprocess</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mut0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">torch.Tensor</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/torchnldm/model/nldm.html#NLDM.preprocess"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchnldm.model.nldm.NLDM.preprocess" title="Permalink to this definition"></a></dt>
+<dd><p>Performs preprocessing via the models’ DataScaler, over the input features.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="torchnldm.model.nldm.NLDMBase">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">torchnldm.model.nldm.</span></span><span class="sig-name descname"><span class="pre">NLDMBase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">encoder</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Module</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">decoder</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Module</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">latent_nde</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#torchnldm.model.nde.NeuralODE" title="torchnldm.model.nde.NeuralODE"><span class="pre">NeuralODE</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">nde_integration_method</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'euler'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nde_adjoint</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">device</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">device(type='cpu')</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchnldm/model/nldm.html#NLDMBase"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchnldm.model.nldm.NLDMBase" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code></p>
+<p>Neural Latent Dynamics Model abstract base class. It defines the basic structure of a NLDM, composed of an encoder, 
+a latent NDE and a decoder. It provides a common layout for NLDMs and template methods, based on abstract methods that
+need to be implemented by subclasses, thus ensure compatibility with the Trainer and Evaluator classes.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><dl class="field-list simple">
+<dt class="field-odd">encoder<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(nn.Module), maps the state u(t) to its latent representation z(t).</p>
+</dd>
+<dt class="field-even">decoder<span class="colon">:</span></dt>
+<dd class="field-even"><p>(nn.Module), maps the latent state z(t) to back to high-dimensions, namely u(t).</p>
+</dd>
+<dt class="field-odd">latent_nde<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(NeuralDE), evolves the latent state z(t), from t_0, to t_f.</p>
+</dd>
+<dt class="field-even">integration_method<span class="colon">:</span></dt>
+<dd class="field-even"><p>(std), numerical scheme used for the latent time-integration (those available in torchdiffeq (ODEs), torchsde (SDEs)).</p>
+</dd>
+<dt class="field-odd">adjoint<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(bool), flag for enabling the adjoint method (<a class="reference external" href="https://arxiv.org/abs/1806.07366">https://arxiv.org/abs/1806.07366</a>)</p>
+</dd>
+<dt class="field-even">device<span class="colon">:</span></dt>
+<dd class="field-even"><p>(torch.device), device where the model will be loaded.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="torchnldm.model.nldm.NLDMBase.adjoint">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">adjoint</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#torchnldm.model.nldm.NLDMBase.adjoint" title="Permalink to this definition"></a></dt>
+<dd><p>Flag enabling the adjoint sensitivity method.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="torchnldm.model.nldm.NLDMBase.bidirectional">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">bidirectional</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#torchnldm.model.nldm.NLDMBase.bidirectional" title="Permalink to this definition"></a></dt>
+<dd><p>Flag enabling the bidirectional training scheme.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="torchnldm.model.nldm.NLDMBase.evaluate">
+<span class="sig-name descname"><span class="pre">evaluate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="torchnldm.data.html#torchnldm.data.dataloader.DataLoader" title="torchnldm.data.dataloader.DataLoader"><span class="pre">DataLoader</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">t0_index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param_index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timesteps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">enable_scaling</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/torchnldm/model/nldm.html#NLDMBase.evaluate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchnldm.model.nldm.NLDMBase.evaluate" title="Permalink to this definition"></a></dt>
+<dd><p>Template method defining the general evaluation routine for a single trajectory prediction. 
+It is based on the predict_trajectory abstract method.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><dl class="field-list simple">
+<dt class="field-odd">dataset<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(DataLoader), dataset object used for training purposes.</p>
+</dd>
+<dt class="field-even">t0_index<span class="colon">:</span></dt>
+<dd class="field-even"><p>(int), index of the initial value (&lt;Nt).</p>
+</dd>
+<dt class="field-odd">param_index<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(int), index of the parameter instance (&lt;N).</p>
+</dd>
+<dt class="field-even">timesteps<span class="colon">:</span></dt>
+<dd class="field-even"><p>(int), length of the prediction window (&lt;N).</p>
+</dd>
+<dt class="field-odd">enable_scaling<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(bool), flag to enable pre- and post-processing via the model’s internal scaler.</p>
+</dd>
+</dl>
+</dd>
+<dt>Returns:</dt><dd><dl class="field-list simple">
+<dt class="field-odd">epoch_loss<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(float), value of the loss.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="torchnldm.model.nldm.NLDMBase.forward">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mut0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tensor</span></span></span><a class="reference internal" href="_modules/torchnldm/model/nldm.html#NLDMBase.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchnldm.model.nldm.NLDMBase.forward" title="Permalink to this definition"></a></dt>
+<dd><p>Abstract method, must be overridden by subclasses, implementing the inference behavior of the model.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="torchnldm.model.nldm.NLDMBase.get_batch_loss">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_batch_loss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="torchnldm.data.html#torchnldm.data.dataloader.DataLoader" title="torchnldm.data.dataloader.DataLoader"><span class="pre">DataLoader</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">section_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t0_index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_sizes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tensor</span></span></span><a class="reference internal" href="_modules/torchnldm/model/nldm.html#NLDMBase.get_batch_loss"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchnldm.model.nldm.NLDMBase.get_batch_loss" title="Permalink to this definition"></a></dt>
+<dd><p>Abstract method, must be overridden by subclasses, implementing the batched loss computation.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="torchnldm.model.nldm.NLDMBase.latent_guidance">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">latent_guidance</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#torchnldm.model.nldm.NLDMBase.latent_guidance" title="Permalink to this definition"></a></dt>
+<dd><p>Flag enabling the latent guidance training scheme.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="torchnldm.model.nldm.NLDMBase.load_model_from_checkpoint">
+<span class="sig-name descname"><span class="pre">load_model_from_checkpoint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">checkpoint_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/torchnldm/model/nldm.html#NLDMBase.load_model_from_checkpoint"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchnldm.model.nldm.NLDMBase.load_model_from_checkpoint" title="Permalink to this definition"></a></dt>
+<dd><p>Given a model checkpoint, it loads the models’ parameters, and eventually additional available infos.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="torchnldm.model.nldm.NLDMBase.load_scaler_from_checkpoint">
+<span class="sig-name descname"><span class="pre">load_scaler_from_checkpoint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">checkpoint</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/torchnldm/model/nldm.html#NLDMBase.load_scaler_from_checkpoint"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchnldm.model.nldm.NLDMBase.load_scaler_from_checkpoint" title="Permalink to this definition"></a></dt>
+<dd><p>Given a model checkpoint, it loads the dataset scaler, to be used for internal pre- and 
+post-processing purposes, within the model.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="torchnldm.model.nldm.NLDMBase.load_scaler_from_dataset">
+<span class="sig-name descname"><span class="pre">load_scaler_from_dataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="torchnldm.data.html#torchnldm.data.dataloader.DataLoader" title="torchnldm.data.dataloader.DataLoader"><span class="pre">DataLoader</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/torchnldm/model/nldm.html#NLDMBase.load_scaler_from_dataset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchnldm.model.nldm.NLDMBase.load_scaler_from_dataset" title="Permalink to this definition"></a></dt>
+<dd><p>Given a dataset, it loads the dataset scaler, to be used for internal pre- and 
+post-processing purposes, within the model.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="torchnldm.model.nldm.NLDMBase.loss">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">loss</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tensor</span></span></span><a class="reference internal" href="_modules/torchnldm/model/nldm.html#NLDMBase.loss"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchnldm.model.nldm.NLDMBase.loss" title="Permalink to this definition"></a></dt>
+<dd><p>Abstract method, must be overridden by subclasses, implementing the loss computation algorithm used in the training routine.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="torchnldm.model.nldm.NLDMBase.loss_criterion">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">loss_criterion</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ut</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ut_pred</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tensor</span></span></span><a class="reference internal" href="_modules/torchnldm/model/nldm.html#NLDMBase.loss_criterion"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchnldm.model.nldm.NLDMBase.loss_criterion" title="Permalink to this definition"></a></dt>
+<dd><p>Abstract method, must be overridden by subclasses, defining the loss criterion for the loss computation.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="torchnldm.model.nldm.NLDMBase.nde_adjoint">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">nde_adjoint</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#torchnldm.model.nldm.NLDMBase.nde_adjoint" title="Permalink to this definition"></a></dt>
+<dd><p>Flag enabling the adjoint sensitivity method.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="torchnldm.model.nldm.NLDMBase.nde_integration_method">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">nde_integration_method</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#torchnldm.model.nldm.NLDMBase.nde_integration_method" title="Permalink to this definition"></a></dt>
+<dd><p>Integration method to perform latent integration.
+Available methods are those implemented within TorchDiffEq (NeuralODE) or TorchSDE (NeuralSDE).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="torchnldm.model.nldm.NLDMBase.predict_trajectory">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">predict_trajectory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="torchnldm.data.html#torchnldm.data.dataloader.DataLoader" title="torchnldm.data.dataloader.DataLoader"><span class="pre">DataLoader</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">t0_index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param_index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timesteps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">enable_scaling</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_inputs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">torch.Tensor</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/torchnldm/model/nldm.html#NLDMBase.predict_trajectory"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchnldm.model.nldm.NLDMBase.predict_trajectory" title="Permalink to this definition"></a></dt>
+<dd><p>Abstract method, must be overridden by subclasses, implementing the single trajectory prediction steps.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="torchnldm.model.nldm.NLDMBase.summary">
+<span class="sig-name descname"><span class="pre">summary</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/torchnldm/model/nldm.html#NLDMBase.summary"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchnldm.model.nldm.NLDMBase.summary" title="Permalink to this definition"></a></dt>
+<dd><p>Prints a summary of the model.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="torchnldm.model.nldm.NLDMBase.training_epoch">
+<span class="sig-name descname"><span class="pre">training_epoch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">dataset:</span> <span class="pre">~torchnldm.data.dataloader.DataLoader,</span> <span class="pre">optimizer:</span> <span class="pre">&lt;module</span> <span class="pre">'torch.optim'</span> <span class="pre">from</span> <span class="pre">'/home/nicola/.local/lib/python3.10/site-packages/torch/optim/__init__.py'&gt;,</span> <span class="pre">batch_sizes:</span> <span class="pre">list[int],</span> <span class="pre">enable_amp:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">False</span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="_modules/torchnldm/model/nldm.html#NLDMBase.training_epoch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchnldm.model.nldm.NLDMBase.training_epoch" title="Permalink to this definition"></a></dt>
+<dd><p>Template method defining the general training routine for one epoch. It is based on the abstract methods defining
+the specific NLDM behavior, which need to be implemented in the child classes, inheriting from the base class.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><dl class="field-list simple">
+<dt class="field-odd">dataset<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(DataLoader), dataset object used for training purposes.</p>
+</dd>
+<dt class="field-even">optimizer<span class="colon">:</span></dt>
+<dd class="field-even"><p>(torch.optim), torch optimizer (e.g. torch.optim.Adam).</p>
+</dd>
+<dt class="field-odd">batch_sizes<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(list[int]), list of batch sizes, more specifically [batch_size_params, batch_size_timesteps, batch_size_nodes].</p>
+</dd>
+<dt class="field-even">enable_amp<span class="colon">:</span></dt>
+<dd class="field-even"><p>(bool), flag for enabling Automatic Mixed Precision.</p>
+</dd>
+</dl>
+</dd>
+<dt>Returns:</dt><dd><dl class="field-list simple">
+<dt class="field-odd">epoch_loss<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(float), value of the loss.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="torchnldm.model.nldm.NLDMBase.validation_epoch">
+<span class="sig-name descname"><span class="pre">validation_epoch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="torchnldm.data.html#torchnldm.data.dataloader.DataLoader" title="torchnldm.data.dataloader.DataLoader"><span class="pre">DataLoader</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_sizes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">enable_amp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="_modules/torchnldm/model/nldm.html#NLDMBase.validation_epoch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchnldm.model.nldm.NLDMBase.validation_epoch" title="Permalink to this definition"></a></dt>
+<dd><p>Template method defining the general validation routine for one epoch. It is based on the abstract methods defining
+the specific NLDM behavior, which need to be implemented in the child classes, inheriting from the base class.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><dl class="field-list simple">
+<dt class="field-odd">dataset<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(DataLoader), dataset object used for training purposes.</p>
+</dd>
+<dt class="field-even">batch_sizes<span class="colon">:</span></dt>
+<dd class="field-even"><p>(list[int]), list of batch sizes, more specifically [batch_size_params, batch_size_timesteps, batch_size_nodes].</p>
+</dd>
+<dt class="field-odd">enable_amp<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(bool), flag for enabling Automatic Mixed Precision.</p>
+</dd>
+</dl>
+</dd>
+<dt>Returns:</dt><dd><dl class="field-list simple">
+<dt class="field-odd">epoch_loss<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(float), value of the loss.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="torchnldm.model.nldm.NLDMConfig">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">torchnldm.model.nldm.</span></span><span class="sig-name descname"><span class="pre">NLDMConfig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Nh</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Np</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">latent_dim</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">state_channels</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ae_conv_dim</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ae_activation</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'elu'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ae_residual_blocks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoder_conv_depth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoder_conv_hidden_channels</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoder_reshape_dim</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoder_mlp_state_hidden_dim</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">256</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoder_param_emb</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'multiply'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoder_mlp_param_depth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoder_mlp_param_hidden_dim</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">256</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoder_mlp_time_depth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoder_mlp_time_hidden_dim</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">256</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">decoder_conv_depth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">decoder_conv_hidden_channels</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">32</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">decoder_reshape_dim</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">decoder_mlp_state_hidden_dim</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">256</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nde_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'ode'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nde_depth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nde_hidden_dim</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">256</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nde_integration_method</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'euler'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nde_adjoint</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nde_activation</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'elu'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">torch.device</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">device(type='cpu')</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchnldm/model/nldm.html#NLDMConfig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchnldm.model.nldm.NLDMConfig" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="torchnldm.utils.html#torchnldm.utils.config.ConfigBase" title="torchnldm.utils.config.ConfigBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">ConfigBase</span></code></a></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="torchnldm.model.nldm.NLDMConfig.Nh">
+<span class="sig-name descname"><span class="pre">Nh</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#torchnldm.model.nldm.NLDMConfig.Nh" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="torchnldm.model.nldm.NLDMConfig.Np">
+<span class="sig-name descname"><span class="pre">Np</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#torchnldm.model.nldm.NLDMConfig.Np" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="torchnldm.model.nldm.NLDMConfig.ae_activation">
+<span class="sig-name descname"><span class="pre">ae_activation</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'elu'</span></em><a class="headerlink" href="#torchnldm.model.nldm.NLDMConfig.ae_activation" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="torchnldm.model.nldm.NLDMConfig.ae_conv_dim">
+<span class="sig-name descname"><span class="pre">ae_conv_dim</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></em><a class="headerlink" href="#torchnldm.model.nldm.NLDMConfig.ae_conv_dim" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="torchnldm.model.nldm.NLDMConfig.ae_residual_blocks">
+<span class="sig-name descname"><span class="pre">ae_residual_blocks</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#torchnldm.model.nldm.NLDMConfig.ae_residual_blocks" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="torchnldm.model.nldm.NLDMConfig.decoder_conv_depth">
+<span class="sig-name descname"><span class="pre">decoder_conv_depth</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2</span></em><a class="headerlink" href="#torchnldm.model.nldm.NLDMConfig.decoder_conv_depth" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="torchnldm.model.nldm.NLDMConfig.decoder_conv_hidden_channels">
+<span class="sig-name descname"><span class="pre">decoder_conv_hidden_channels</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">32</span></em><a class="headerlink" href="#torchnldm.model.nldm.NLDMConfig.decoder_conv_hidden_channels" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="torchnldm.model.nldm.NLDMConfig.decoder_mlp_state_hidden_dim">
+<span class="sig-name descname"><span class="pre">decoder_mlp_state_hidden_dim</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">256</span></em><a class="headerlink" href="#torchnldm.model.nldm.NLDMConfig.decoder_mlp_state_hidden_dim" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="torchnldm.model.nldm.NLDMConfig.decoder_reshape_dim">
+<span class="sig-name descname"><span class="pre">decoder_reshape_dim</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#torchnldm.model.nldm.NLDMConfig.decoder_reshape_dim" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="torchnldm.model.nldm.NLDMConfig.device">
+<span class="sig-name descname"><span class="pre">device</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">device</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">device(type='cpu')</span></em><a class="headerlink" href="#torchnldm.model.nldm.NLDMConfig.device" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="torchnldm.model.nldm.NLDMConfig.encoder_conv_depth">
+<span class="sig-name descname"><span class="pre">encoder_conv_depth</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2</span></em><a class="headerlink" href="#torchnldm.model.nldm.NLDMConfig.encoder_conv_depth" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="torchnldm.model.nldm.NLDMConfig.encoder_conv_hidden_channels">
+<span class="sig-name descname"><span class="pre">encoder_conv_hidden_channels</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2</span></em><a class="headerlink" href="#torchnldm.model.nldm.NLDMConfig.encoder_conv_hidden_channels" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="torchnldm.model.nldm.NLDMConfig.encoder_mlp_param_depth">
+<span class="sig-name descname"><span class="pre">encoder_mlp_param_depth</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2</span></em><a class="headerlink" href="#torchnldm.model.nldm.NLDMConfig.encoder_mlp_param_depth" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="torchnldm.model.nldm.NLDMConfig.encoder_mlp_param_hidden_dim">
+<span class="sig-name descname"><span class="pre">encoder_mlp_param_hidden_dim</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">256</span></em><a class="headerlink" href="#torchnldm.model.nldm.NLDMConfig.encoder_mlp_param_hidden_dim" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="torchnldm.model.nldm.NLDMConfig.encoder_mlp_state_hidden_dim">
+<span class="sig-name descname"><span class="pre">encoder_mlp_state_hidden_dim</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">256</span></em><a class="headerlink" href="#torchnldm.model.nldm.NLDMConfig.encoder_mlp_state_hidden_dim" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="torchnldm.model.nldm.NLDMConfig.encoder_mlp_time_depth">
+<span class="sig-name descname"><span class="pre">encoder_mlp_time_depth</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2</span></em><a class="headerlink" href="#torchnldm.model.nldm.NLDMConfig.encoder_mlp_time_depth" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="torchnldm.model.nldm.NLDMConfig.encoder_mlp_time_hidden_dim">
+<span class="sig-name descname"><span class="pre">encoder_mlp_time_hidden_dim</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">256</span></em><a class="headerlink" href="#torchnldm.model.nldm.NLDMConfig.encoder_mlp_time_hidden_dim" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="torchnldm.model.nldm.NLDMConfig.encoder_param_emb">
+<span class="sig-name descname"><span class="pre">encoder_param_emb</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'multiply'</span></em><a class="headerlink" href="#torchnldm.model.nldm.NLDMConfig.encoder_param_emb" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="torchnldm.model.nldm.NLDMConfig.encoder_reshape_dim">
+<span class="sig-name descname"><span class="pre">encoder_reshape_dim</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#torchnldm.model.nldm.NLDMConfig.encoder_reshape_dim" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="torchnldm.model.nldm.NLDMConfig.latent_dim">
+<span class="sig-name descname"><span class="pre">latent_dim</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#torchnldm.model.nldm.NLDMConfig.latent_dim" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="torchnldm.model.nldm.NLDMConfig.nde_activation">
+<span class="sig-name descname"><span class="pre">nde_activation</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'elu'</span></em><a class="headerlink" href="#torchnldm.model.nldm.NLDMConfig.nde_activation" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="torchnldm.model.nldm.NLDMConfig.nde_adjoint">
+<span class="sig-name descname"><span class="pre">nde_adjoint</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#torchnldm.model.nldm.NLDMConfig.nde_adjoint" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="torchnldm.model.nldm.NLDMConfig.nde_depth">
+<span class="sig-name descname"><span class="pre">nde_depth</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></em><a class="headerlink" href="#torchnldm.model.nldm.NLDMConfig.nde_depth" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="torchnldm.model.nldm.NLDMConfig.nde_hidden_dim">
+<span class="sig-name descname"><span class="pre">nde_hidden_dim</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">256</span></em><a class="headerlink" href="#torchnldm.model.nldm.NLDMConfig.nde_hidden_dim" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="torchnldm.model.nldm.NLDMConfig.nde_integration_method">
+<span class="sig-name descname"><span class="pre">nde_integration_method</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'euler'</span></em><a class="headerlink" href="#torchnldm.model.nldm.NLDMConfig.nde_integration_method" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="torchnldm.model.nldm.NLDMConfig.nde_type">
+<span class="sig-name descname"><span class="pre">nde_type</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'ode'</span></em><a class="headerlink" href="#torchnldm.model.nldm.NLDMConfig.nde_type" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="torchnldm.model.nldm.NLDMConfig.state_channels">
+<span class="sig-name descname"><span class="pre">state_channels</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></em><a class="headerlink" href="#torchnldm.model.nldm.NLDMConfig.state_channels" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-torchnldm.model">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-torchnldm.model" title="Permalink to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="torchnldm.data.html" class="btn btn-neutral float-left" title="torchnldm.data package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="torchnldm.train.html" class="btn btn-neutral float-right" title="torchnldm.train package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Nicola Farenga.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>torchnldm.data.dataloader &mdash; TorchNLDM 0.1 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            TorchNLDM
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../torchnldm.data.html">torchnldm.data package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../torchnldm.model.html">torchnldm.model package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../torchnldm.train.html">torchnldm.train package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../torchnldm.evaluate.html">torchnldm.evaluate package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../torchnldm.utils.html">torchnldm.utils package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">TorchNLDM</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">torchnldm.data.dataloader</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for torchnldm.data.dataloader</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">h5py</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span> <span class="nn">..utils.addtypes</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">..utils.addtypes</span> <span class="kn">import</span> <span class="n">Tensor</span>
+<span class="kn">from</span> <span class="nn">..utils.ops</span> <span class="kn">import</span> <span class="n">POD</span>
+
+<div class="viewcode-block" id="DataLoaderConfig"><a class="viewcode-back" href="../../../torchnldm.data.html#torchnldm.data.dataloader.DataLoaderConfig">[docs]</a><span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">DataLoaderConfig</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    DataLoader class configuration object</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">filepath</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">time_validation_split</span><span class="p">:</span> <span class="nb">int</span> <span class="ow">or</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">time_subsampling</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">scaler_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">reduced_dim</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">device</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s1">&#39;cpu&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="DataLoader"><a class="viewcode-back" href="../../../torchnldm.data.html#torchnldm.data.dataloader.DataLoader">[docs]</a><span class="k">class</span> <span class="nc">DataLoader</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    DataLoader class. It allows to load and manage PDEGen (https://github.com/farenga/pdegen/) datasets, or .hdf5 files complying</span>
+<span class="sd">    with PDEGen dataset structure. </span>
+<span class="sd">        </span>
+<span class="sd">    Args:</span>
+<span class="sd">        :config: (DataLoaderConfig), dataset configuration object.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">DataLoaderConfig</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        
+        <span class="c1"># set dataset device (cpu/gpu) and path</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">device</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">device</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">filepath</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">filepath</span>
+
+        <span class="c1"># load tensors in hdf5 file</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__load_tensors</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">time_subsampling</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># parsing subsampling configuration (Nt, subsampling_method)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__time_subsampling</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">time_subsampling</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">config</span><span class="o">.</span><span class="n">time_subsampling</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+        <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">time_validation_split</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># train/test splitting along time dimension</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">time_validation_split</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+                <span class="k">assert</span> <span class="n">config</span><span class="o">.</span><span class="n">time_validation_split</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">Nt</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;When providing an int time_validation_split train/test time-split index must be &lt;Nt, got instead </span><span class="si">{</span><span class="n">config</span><span class="o">.</span><span class="n">time_validation_split</span><span class="si">}</span><span class="s1">&#39;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">Nt_train</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">time_validation_split</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">time_validation_split</span><span class="p">,</span> <span class="nb">float</span><span class="p">):</span>
+                <span class="k">assert</span> <span class="n">config</span><span class="o">.</span><span class="n">time_validation_split</span> <span class="o">&lt;</span> <span class="mf">1.</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;When providing a float time_validation_split, it must be &lt;1 since, got instead </span><span class="si">{</span><span class="n">config</span><span class="o">.</span><span class="n">time_validation_split</span><span class="si">}</span><span class="s1">&#39;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">Nt_train</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">time_validation_split</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">Nt</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;time_validation_split type must be either int (&lt;Nt) or float (&lt;1.), got instead </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">time_validation_split</span><span class="p">)</span><span class="si">}</span><span class="s1">.&#39;</span><span class="p">)</span>
+            
+            <span class="bp">self</span><span class="o">.</span><span class="n">sections</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s1">&#39;train&#39;</span><span class="p">,</span><span class="s1">&#39;validation&#39;</span><span class="p">])</span>
+
+        <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">reduced_dim</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">reduced_dim</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">reduced_dim</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">reduced_dim</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__reduce</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;reduced_dim type must be int, got insteast </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">reduced_dim</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+
+        <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">scaler_type</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># rescale data based on specified method</span>
+            <span class="c1"># scaler params are orderd in the following manner</span>
+            <span class="c1"># minmax:   [S_min, S_max, P_min, P_max, coords_min, coords_max]</span>
+            <span class="c1"># standard: [S_mean, S_std, P_mean, P_std, coords_mean, coords_std]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">scaler_type</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">scaler_type</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__scale</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>    
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Dataset loading complete.&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">summary</span><span class="p">()</span>
+        
+    <span class="k">def</span> <span class="nf">__load_tensors</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">h5file</span> <span class="o">=</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filepath</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__S</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">h5file</span><span class="p">[</span><span class="s1">&#39;S&#39;</span><span class="p">][:])</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span><span class="o">.</span><span class="n">contiguous</span><span class="p">()</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">__P</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">h5file</span><span class="p">[</span><span class="s1">&#39;P&#39;</span><span class="p">][:])</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span><span class="o">.</span><span class="n">contiguous</span><span class="p">()</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">__C</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">h5file</span><span class="p">[</span><span class="s1">&#39;C&#39;</span><span class="p">][:])</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span><span class="o">.</span><span class="n">contiguous</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sections</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;complete&#39;</span><span class="p">]</span>
+
+        <span class="n">N</span><span class="p">,</span> <span class="n">Nt</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__S</span><span class="o">.</span><span class="n">shape</span>
+        <span class="n">N_</span><span class="p">,</span> <span class="n">Nt_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__P</span><span class="o">.</span><span class="n">shape</span>       
+
+        <span class="k">assert</span> <span class="n">N</span><span class="o">==</span><span class="n">N_</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;First dimension (N) of S and P tensors must match, got instead: </span><span class="si">{</span><span class="n">N</span><span class="si">}</span><span class="s1">!=</span><span class="si">{</span><span class="n">N_</span><span class="si">}</span><span class="s1">&#39;</span>
+        <span class="k">assert</span> <span class="n">Nt</span><span class="o">==</span><span class="n">Nt_</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;Second dimension (Nt) of S and P tensors must match, got instead: </span><span class="si">{</span><span class="n">Nt</span><span class="si">}</span><span class="s1">!=</span><span class="si">{</span><span class="n">Nt_</span><span class="si">}</span><span class="s1">&#39;</span>
+
+        <span class="n">dims</span> <span class="o">=</span> <span class="n">h5file</span><span class="p">[</span><span class="s1">&#39;dims&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span>         
+        <span class="bp">self</span><span class="o">.</span><span class="n">N</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Nt</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Nh</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Np</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n</span> <span class="o">=</span> <span class="n">dims</span><span class="p">[</span><span class="s1">&#39;N&#39;</span><span class="p">],</span> <span class="n">dims</span><span class="p">[</span><span class="s1">&#39;Nt&#39;</span><span class="p">],</span> <span class="n">dims</span><span class="p">[</span><span class="s1">&#39;Nh&#39;</span><span class="p">],</span> <span class="n">dims</span><span class="p">[</span><span class="s1">&#39;Np&#39;</span><span class="p">],</span> <span class="n">dims</span><span class="p">[</span><span class="s1">&#39;n&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">M</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">d</span> <span class="o">=</span> <span class="n">dims</span><span class="p">[</span><span class="s1">&#39;M&#39;</span><span class="p">],</span> <span class="n">dims</span><span class="p">[</span><span class="s1">&#39;d&#39;</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">__time_subsampling</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>  <span class="n">Nt_new</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span> <span class="n">subsampling_method</span><span class="p">:</span> <span class="nb">str</span><span class="o">=</span><span class="s1">&#39;regular&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="n">Nt_new</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">Nt</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;Sub-sampling Nt_new must be &lt; Nt=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">Nt</span><span class="si">}</span><span class="s1">, got instead </span><span class="si">{</span><span class="n">Nt_new</span><span class="si">}</span><span class="s1">.&#39;</span>
+        <span class="k">if</span> <span class="n">subsampling_method</span><span class="o">==</span><span class="s1">&#39;regular&#39;</span><span class="p">:</span>
+            <span class="n">subsampled_indices</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">Nt</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">Nt</span><span class="o">//</span><span class="n">Nt_new</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="n">subsampling_method</span><span class="o">==</span><span class="s1">&#39;random&#39;</span><span class="p">:</span>
+            <span class="n">subsampled_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Nt</span><span class="p">),</span> <span class="n">Nt_new</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Admissible subsampling types are either &quot;regular&quot; or &quot;random&quot;, got instead </span><span class="si">{</span><span class="n">subsampling_method</span><span class="si">}</span><span class="s1">.&#39;</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">__S</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__S</span><span class="p">[:,</span><span class="n">subsampled_indices</span><span class="p">,:]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__P</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__P</span><span class="p">[:,</span><span class="n">subsampled_indices</span><span class="p">,:]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Nt</span> <span class="o">=</span> <span class="n">Nt_new</span>
+    
+    <span class="k">def</span> <span class="nf">__reduce</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Substitutes the snapshots tensor S with the projected one via POD.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__S</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">U</span> <span class="o">=</span> <span class="n">POD</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__S</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">reduced_dim</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__scale</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Instantiates a DataScaler object and performs scaling of the dataset&#39;s features.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="kn">from</span> <span class="nn">.datascaler</span> <span class="kn">import</span> <span class="n">DataScaler</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scaler</span> <span class="o">=</span> <span class="n">DataScaler</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scaler_type</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scaler</span><span class="o">.</span><span class="n">scale_dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+<div class="viewcode-block" id="DataLoader.to"><a class="viewcode-back" href="../../../torchnldm.data.html#torchnldm.data.dataloader.DataLoader.to">[docs]</a>    <span class="k">def</span> <span class="nf">to</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">device</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s1">&#39;cpu&#39;</span><span class="p">))</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Moves the dataset&#39;s tensors to the specified device.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">device</span> <span class="o">=</span> <span class="n">device</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__S</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__S</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span><span class="o">.</span><span class="n">contiguous</span><span class="p">()</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">__P</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__P</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span><span class="o">.</span><span class="n">contiguous</span><span class="p">()</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">__C</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__C</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span><span class="o">.</span><span class="n">contiguous</span><span class="p">()</span> </div>
+
+<div class="viewcode-block" id="DataLoader.get_scaler_parameters"><a class="viewcode-back" href="../../../torchnldm.data.html#torchnldm.data.dataloader.DataLoader.get_scaler_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">get_scaler_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">return_type</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span> <span class="ow">or</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns the dataset&#39;s scaling parameters.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">assert</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;scaler&#39;</span><span class="p">),</span> <span class="s1">&#39;Scaler was not requested when at DataLoader instantiation.&#39;</span>
+        <span class="k">if</span> <span class="n">return_type</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">scaler</span><span class="o">.</span><span class="n">params</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">scaler</span><span class="o">.</span><span class="n">type</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">scaler</span><span class="o">.</span><span class="n">params</span></div>
+
+<div class="viewcode-block" id="DataLoader.summary"><a class="viewcode-back" href="../../../torchnldm.data.html#torchnldm.data.dataloader.DataLoader.summary">[docs]</a>    <span class="k">def</span> <span class="nf">summary</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Prints a summary of the dataset&#39;s infos.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Dataset Summary&#39;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39; Dataset location:&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">filepath</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39; Dimensions:</span><span class="se">\t</span><span class="s1">N:&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">N</span><span class="p">,</span><span class="s1">&#39;, Nt:&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Nt</span><span class="p">,</span><span class="s1">&#39;, Np:&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Np</span><span class="p">,</span><span class="s1">&#39;, Nh:&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Nh</span><span class="p">,</span><span class="s1">&#39;, n:&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n</span> <span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t\t</span><span class="s1">M:&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">M</span><span class="p">,</span> <span class="s1">&#39;, d:&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">d</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="s1">&#39;Nt_train&#39;</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39; Train-validation time splitting (Nt_train):&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Nt_train</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="s1">&#39;scaler_type&#39;</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39; Scaler type:&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">scaler_type</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="s1">&#39;reduced_dim&#39;</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39; POD modes:&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">reduced_dim</span><span class="p">)</span></div>
+        
+<div class="viewcode-block" id="DataLoader.get_sample"><a class="viewcode-back" href="../../../torchnldm.data.html#torchnldm.data.dataloader.DataLoader.get_sample">[docs]</a>    <span class="k">def</span> <span class="nf">get_sample</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span> <span class="n">j</span><span class="p">:</span><span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns a sample from the S and P tensors.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            :i: (int), param instance selector, index along 0-th dimension (&lt;N). </span>
+<span class="sd">            :j: (int), time-step selector, index along 1-st dimension (&lt;Nt).</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            uh(t_j;mu_i), (mu_i,t_j)    </span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__S</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,:],</span> <span class="bp">self</span><span class="o">.</span><span class="n">__P</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,:]</span></div>
+    
+<div class="viewcode-block" id="DataLoader.get_section"><a class="viewcode-back" href="../../../torchnldm.data.html#torchnldm.data.dataloader.DataLoader.get_section">[docs]</a>    <span class="k">def</span> <span class="nf">get_section</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">section_id</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="s1">&#39;complete&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span><span class="n">Tensor</span><span class="p">,</span><span class="nb">int</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns a section of the dataset.</span>
+<span class="sd">        Instead of creating multiple tensors, accounting for the train and validation splits, the splits</span>
+<span class="sd">        are managed via indexing over the time-dimension.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            :section_id: (str): name of the dataset subsection (&#39;complete&#39;,&#39;train&#39;,&#39;validation&#39;).</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            S (Tensor), P (Tensor), max_timesteps (int).</span>
+<span class="sd">        &#39;&#39;&#39;</span>        
+        <span class="k">assert</span> <span class="n">section_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sections</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;section_id must be present in </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">sections</span><span class="si">}</span><span class="s1">, got instead </span><span class="si">{</span><span class="n">section_id</span><span class="si">}</span><span class="s1">.&#39;</span>
+        
+        <span class="k">if</span> <span class="n">section_id</span><span class="o">==</span><span class="s1">&#39;complete&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__S</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__P</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Nt</span>
+        <span class="k">elif</span> <span class="n">section_id</span><span class="o">==</span><span class="s1">&#39;train&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__S</span><span class="p">[:,:</span><span class="bp">self</span><span class="o">.</span><span class="n">Nt_train</span><span class="p">,:],</span> <span class="bp">self</span><span class="o">.</span><span class="n">__P</span><span class="p">[:,:</span><span class="bp">self</span><span class="o">.</span><span class="n">Nt_train</span><span class="p">,:],</span> <span class="bp">self</span><span class="o">.</span><span class="n">Nt_train</span>
+        <span class="k">elif</span> <span class="n">section_id</span><span class="o">==</span><span class="s1">&#39;validation&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__S</span><span class="p">[:,</span><span class="bp">self</span><span class="o">.</span><span class="n">Nt_train</span><span class="o">-</span><span class="mi">1</span><span class="p">:,:],</span> <span class="bp">self</span><span class="o">.</span><span class="n">__P</span><span class="p">[:,</span><span class="bp">self</span><span class="o">.</span><span class="n">Nt_train</span><span class="o">-</span><span class="mi">1</span><span class="p">:,:],</span> <span class="bp">self</span><span class="o">.</span><span class="n">Nt</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">Nt_train</span></div>
+        
+<div class="viewcode-block" id="DataLoader.get_train_t0_indices"><a class="viewcode-back" href="../../../torchnldm.data.html#torchnldm.data.dataloader.DataLoader.get_train_t0_indices">[docs]</a>    <span class="k">def</span> <span class="nf">get_train_t0_indices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timesteps</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">shuffle</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span><span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span><span class="nb">int</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Args:</span>
+<span class="sd">            timesteps (int): number of timesteps (sequence length)</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            section_id</span>
+<span class="sd">        &#39;&#39;&#39;</span>     
+        <span class="k">if</span> <span class="s1">&#39;train&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sections</span><span class="p">:</span>
+            <span class="n">section_id</span> <span class="o">=</span> <span class="s1">&#39;train&#39;</span>    
+            <span class="n">n_subtrajectories</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Nt_train</span> <span class="o">-</span> <span class="n">timesteps</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">section_id</span> <span class="o">=</span> <span class="s1">&#39;complete&#39;</span>
+            <span class="n">n_subtrajectories</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Nt</span> <span class="o">-</span> <span class="n">timesteps</span>
+        
+        <span class="n">sub_trajectories_t0_indices</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">n_subtrajectories</span><span class="p">))</span>
+        
+        <span class="k">if</span> <span class="n">shuffle</span><span class="p">:</span>
+            <span class="n">random</span><span class="o">.</span><span class="n">shuffle</span><span class="p">(</span><span class="n">sub_trajectories_t0_indices</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">section_id</span><span class="p">,</span> <span class="n">sub_trajectories_t0_indices</span><span class="p">,</span> <span class="n">n_subtrajectories</span> </div>
+
+<div class="viewcode-block" id="DataLoader.get_trajectory"><a class="viewcode-back" href="../../../torchnldm.data.html#torchnldm.data.dataloader.DataLoader.get_trajectory">[docs]</a>    <span class="k">def</span> <span class="nf">get_trajectory</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                <span class="n">section_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                <span class="n">t0_index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+                <span class="n">param_index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+                <span class="n">timesteps</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+                <span class="n">field_form</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">]:</span>
+
+
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns a single trajectory (ut), their initial values (u0) the respective parameters </span>
+<span class="sd">        instances (mut0_batch), and timesteps (t_batch), sampled from the Snapshots and Parameters </span>
+<span class="sd">        tensors (S,P), given batch sizes an initial timestep. In the case batch_size_nodes is passed, </span>
+<span class="sd">        the output will be in field form, so the last dimension of the state trajectory tensor will be </span>
+<span class="sd">        of shape (batch_size_nodes,n) instead than Nh.</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            :section_id: (str), id of the dataset section (&#39;complete&#39;,&#39;train&#39;,&#39;validation&#39;).</span>
+<span class="sd">            :t0_index: (int), index of the initial timestep (&lt;Nt-batch_size_timesteps)</span>
+<span class="sd">            :param_index: (int), index of sampled paramter instance (&lt;=N)</span>
+<span class="sd">            :timesteps: (int), trajectories length (&lt;=Nt)</span>
+<span class="sd">            :field_form: (bool), flag enabling field form</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            :u0: (Tensor), initial value, shape = (Nh,) or (M,n)</span>
+<span class="sd">            :mut0: (Tensor), parameters instances and timesteps related to the initial value, shape = (Np)</span>
+<span class="sd">            :x: (Tensor), mesh nodes coordinates, shape = (M, d)</span>
+<span class="sd">            :t: (Tensor), 1d tensor of timesteps, shape = (batch_size_timesteps,)</span>
+<span class="sd">            :ut: (Tensor), state trajectory, shape = (timesteps, Nh) or (...,batch_size_nodes,n)</span>
+
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="c1"># Checks</span>
+        <span class="k">assert</span> <span class="n">section_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sections</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;Data selector must be present in </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">sections</span><span class="si">}</span><span class="s1">&#39;</span>
+        <span class="k">assert</span> <span class="n">param_index</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">N</span><span class="p">,</span> <span class="s1">&#39;param_index must be &lt;N.&#39;</span>
+        
+        <span class="c1"># Extracting dataset subsection        </span>
+        <span class="n">S</span><span class="p">,</span><span class="n">P</span><span class="p">,</span> <span class="n">max_timesteps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_section</span><span class="p">(</span><span class="n">section_id</span><span class="p">)</span>
+        
+        <span class="k">assert</span> <span class="n">t0_index</span> <span class="o">&lt;</span> <span class="n">max_timesteps</span> <span class="o">-</span> <span class="n">timesteps</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;Must be: t0_index &lt; max_timesteps - timesteps, got instead </span><span class="si">{</span><span class="n">t0_index</span><span class="si">}</span><span class="s1"> &gt;= </span><span class="si">{</span><span class="n">max_timesteps</span><span class="si">}</span><span class="s1"> - </span><span class="si">{</span><span class="n">timesteps</span><span class="si">}</span><span class="s1">&#39;</span>
+        
+        <span class="c1"># Extracting trajectory, initial value, parameters</span>
+        <span class="n">ut</span> <span class="o">=</span> <span class="n">S</span><span class="p">[</span><span class="n">param_index</span><span class="p">,</span><span class="n">t0_index</span><span class="p">:</span><span class="n">t0_index</span><span class="o">+</span><span class="n">timesteps</span><span class="p">,:]</span> <span class="c1"># [timesteps,Nh]</span>
+        <span class="n">u0</span> <span class="o">=</span> <span class="n">ut</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="o">...</span><span class="p">]</span>                                    <span class="c1"># [Nh]</span>
+        <span class="n">mut0</span> <span class="o">=</span> <span class="n">P</span><span class="p">[</span><span class="n">param_index</span><span class="p">,</span><span class="n">t0_index</span><span class="p">,:]</span>                  <span class="c1"># [Np+1]</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="n">P</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="n">t0_index</span><span class="p">:</span><span class="n">t0_index</span><span class="o">+</span><span class="n">timesteps</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>           <span class="c1"># [timesteps]</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__C</span>                                        <span class="c1"># [M,d]</span>
+        
+        <span class="k">if</span> <span class="n">field_form</span><span class="p">:</span>
+            <span class="c1"># Reshape last dimension for Field formulation</span>
+            <span class="c1"># such that (...,Nh)-&gt;(...,M,n)</span>
+            <span class="n">ut</span> <span class="o">=</span> <span class="n">ut</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">timesteps</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">M</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">)</span>        <span class="c1"># [timesteps, M, n]</span>
+            <span class="n">u0</span> <span class="o">=</span> <span class="n">u0</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">M</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">)</span>                   <span class="c1"># [M, n]</span>
+            <span class="c1">#mut0 = mut0.unsqueeze(0).repeat(self.M, 1)     # [M, Np+1]</span>
+            <span class="n">mut0</span> <span class="o">=</span> <span class="n">mut0</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">expand</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">M</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>     <span class="c1"># [M, Np+1]</span>
+
+        <span class="k">return</span>  <span class="n">u0</span><span class="o">.</span><span class="n">contiguous</span><span class="p">(),</span> <span class="n">mut0</span><span class="o">.</span><span class="n">contiguous</span><span class="p">(),</span> <span class="n">x</span><span class="o">.</span><span class="n">contiguous</span><span class="p">(),</span> <span class="n">t</span><span class="o">.</span><span class="n">contiguous</span><span class="p">(),</span> <span class="n">ut</span><span class="o">.</span><span class="n">contiguous</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="DataLoader.get_batch"><a class="viewcode-back" href="../../../torchnldm.data.html#torchnldm.data.dataloader.DataLoader.get_batch">[docs]</a>    <span class="k">def</span> <span class="nf">get_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                  <span class="n">section_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                  <span class="n">t0_index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+                  <span class="n">batch_size_params</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+                  <span class="n">batch_size_timesteps</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> 
+                  <span class="n">batch_size_nodes</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">]:</span>
+
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns a batch of trajectories (ut), their initial values (u0) the respective parameters </span>
+<span class="sd">        instances (mut0_batch), and timesteps (t_batch), sampled from the Snapshots and Parameters </span>
+<span class="sd">        tensors (S,P), given batch sizes an initial timestep. In the case batch_size_nodes is passed, </span>
+<span class="sd">        the output will be in field form, so the last dimension of the state trajectory tensor will be </span>
+<span class="sd">        of shape (batch_size_nodes,n) instead than Nh.</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            :section_id: (str), id of the dataset section (&#39;complete&#39;,&#39;train&#39;,&#39;validation&#39;).</span>
+<span class="sd">            :t0_index: (int), index of the initial timestep (&lt;Nt-batch_size_timesteps)</span>
+<span class="sd">            :batch_size_params: (int), number of sampled trajectories (&lt;=N)</span>
+<span class="sd">            :batch_size_timesteps: (int), trajectories length (&lt;=Nt)</span>
+<span class="sd">            :batch_size_nodes: (int), number of sampled mesh nodes (&lt;=M)</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            :u0: (Tensor), batch of initial values, shape = (batch_size_params, Nh) or (...,batch_size_nodes,n)</span>
+<span class="sd">            :mut0: (Tensor), batch of parameters and timesteps related to the initial values, shape = (batch_size_params, Np)</span>
+<span class="sd">            :x: (Tensor), batch of sampled mesh nodes coordinates, shape = (batch_size, batch_size_nodes, d)</span>
+<span class="sd">            :t: (Tensor), 1d tensor of timesteps, shape = (batch_size_timesteps,)</span>
+<span class="sd">            :ut: (Tensor), batch of state trajectories, shape = (batch_size_timesteps, batch_size_params, Nh) or (...,batch_size_nodes,n)</span>
+<span class="sd">            :mut: (Tensor), batch of parameters and timesteps related to the whole trajectory, shape = (batch_size_timesteps, batch_size, Np)</span>
+
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="c1"># Checks</span>
+        <span class="k">assert</span> <span class="n">section_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sections</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;Data selector must be present in </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">sections</span><span class="si">}</span><span class="s1">&#39;</span>
+        <span class="k">assert</span> <span class="mi">1</span><span class="o">&lt;=</span> <span class="n">batch_size_params</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">N</span><span class="p">,</span> <span class="s1">&#39;batch_n_param must be &gt;=1, &lt;=N.&#39;</span>
+
+        <span class="c1"># Extracting dataset subsection        </span>
+        <span class="n">S</span><span class="p">,</span><span class="n">P</span><span class="p">,</span> <span class="n">max_timesteps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_section</span><span class="p">(</span><span class="n">section_id</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="mi">1</span><span class="o">&lt;=</span> <span class="n">batch_size_timesteps</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Nt</span><span class="p">,</span> <span class="s1">&#39;batch_n_param must be &gt;=1, &lt;=Nt.&#39;</span>
+
+        <span class="k">assert</span> <span class="n">t0_index</span> <span class="o">&lt;</span> <span class="n">max_timesteps</span> <span class="o">-</span> <span class="n">batch_size_timesteps</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;Must be: t0_index &lt; max_timesteps - batch_size_timesteps, got instead </span><span class="si">{</span><span class="n">t0_index</span><span class="si">}</span><span class="s1"> &gt;= </span><span class="si">{</span><span class="n">max_timesteps</span><span class="si">}</span><span class="s1"> - </span><span class="si">{</span><span class="n">batch_size_timesteps</span><span class="si">}</span><span class="s1">&#39;</span>
+        
+        <span class="n">params_sampled_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">])</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">N</span><span class="o">==</span><span class="mi">1</span> <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">N</span><span class="p">),</span> <span class="n">batch_size_params</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            
+        <span class="c1"># Forward trajectories extraction </span>
+        <span class="c1"># permuting to have time as first axis in batch tensors</span>
+        <span class="c1"># (torch.permute gives a speedup wrt torch.stack, since we avoid the creation of an array of tensors)</span>
+        <span class="n">tf_index</span> <span class="o">=</span> <span class="n">t0_index</span><span class="o">+</span><span class="n">batch_size_timesteps</span>
+        <span class="n">ut</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">permute</span><span class="p">(</span><span class="n">S</span><span class="p">[</span><span class="n">params_sampled_indices</span> <span class="k">if</span> <span class="n">batch_size_params</span><span class="o">&gt;</span><span class="mi">1</span> <span class="k">else</span> <span class="o">...</span><span class="p">,</span><span class="n">t0_index</span><span class="p">:</span><span class="n">tf_index</span><span class="p">,:],(</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">))</span>   <span class="c1"># [batch_size_timesteps, batch_size_params, Nh]</span>
+        <span class="n">mut</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">permute</span><span class="p">(</span><span class="n">P</span><span class="p">[</span><span class="n">params_sampled_indices</span> <span class="k">if</span> <span class="n">batch_size_params</span><span class="o">&gt;</span><span class="mi">1</span> <span class="k">else</span> <span class="o">...</span><span class="p">,</span><span class="n">t0_index</span><span class="p">:</span><span class="n">tf_index</span><span class="p">,:],(</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">))</span>  <span class="c1"># [batch_size_timesteps, batch_size_params, Np]</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="n">P</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="n">t0_index</span><span class="p">:</span><span class="n">tf_index</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>                                                                               <span class="c1"># [batch_size_timesteps]</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__C</span>                                                                                                <span class="c1"># [M, d]</span>
+
+        <span class="k">if</span> <span class="n">batch_size_nodes</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># Sampling grid nodes coordinates and reshaping tensors for Field formulation</span>
+            <span class="k">assert</span> <span class="n">batch_size_nodes</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">M</span><span class="p">,</span> <span class="s1">&#39;batch_size_nodes must be &lt;=M.&#39;</span>
+            <span class="n">nodes_sampled_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">M</span><span class="o">-</span><span class="n">batch_size_nodes</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">batch_size_nodes</span><span class="p">)</span>
+            <span class="n">ut</span> <span class="o">=</span> <span class="n">ut</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">batch_size_timesteps</span><span class="p">,</span> <span class="n">batch_size_params</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">M</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">)[:,:,</span> <span class="n">nodes_sampled_indices</span><span class="p">,</span> <span class="p">:]</span> <span class="c1"># [batch_size_timesteps, batch_size_params, batch_size_nodes, n]</span>
+            <span class="c1">#mut = mut.unsqueeze(-2).repeat(1, 1, batch_size_nodes, 1)                                           # [batch_size_timesteps, batch_size_params , batch_size_nodes, Np]</span>
+            <span class="c1">#x = self.__C[nodes_sampled_indices, :].unsqueeze(0).repeat(batch_size_params, 1, 1)                 # [batch_size_params, batch_size_nodes, d]</span>
+            <span class="n">mut</span> <span class="o">=</span> <span class="n">mut</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">expand</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">batch_size_nodes</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>                                         <span class="c1"># [batch_size_timesteps, batch_size_params , batch_size_nodes, Np]</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__C</span><span class="p">[</span><span class="n">nodes_sampled_indices</span><span class="p">,</span> <span class="p">:]</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">expand</span><span class="p">(</span><span class="n">batch_size_params</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>                <span class="c1"># [batch_size_params, batch_size_nodes, d]</span>
+            
+        <span class="n">u0</span> <span class="o">=</span> <span class="n">ut</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="o">...</span><span class="p">]</span>                                                                                 <span class="c1"># [batch_size_params, Nh] or [batch_size_params, batch_size_nodes, n]</span>
+        <span class="n">mut0</span> <span class="o">=</span> <span class="n">mut</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="o">...</span><span class="p">]</span>                                                                              <span class="c1"># [batch_size_params, Np] or [batch_size_params, batch_size_nodes, Np]</span>
+
+        <span class="k">return</span>  <span class="n">u0</span><span class="o">.</span><span class="n">contiguous</span><span class="p">(),</span> <span class="n">mut0</span><span class="o">.</span><span class="n">contiguous</span><span class="p">(),</span> <span class="n">x</span><span class="o">.</span><span class="n">contiguous</span><span class="p">(),</span> <span class="n">t</span><span class="o">.</span><span class="n">contiguous</span><span class="p">(),</span> <span class="n">ut</span><span class="o">.</span><span class="n">contiguous</span><span class="p">(),</span> <span class="n">mut</span><span class="o">.</span><span class="n">contiguous</span><span class="p">()</span></div></div>
+
+
+
+     
+    
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Nicola Farenga.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

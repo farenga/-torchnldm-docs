@@ -1,0 +1,976 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>torchnldm.model.nldm &mdash; TorchNLDM 0.1 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            TorchNLDM
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../torchnldm.data.html">torchnldm.data package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../torchnldm.model.html">torchnldm.model package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../torchnldm.train.html">torchnldm.train package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../torchnldm.evaluate.html">torchnldm.evaluate package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../torchnldm.utils.html">torchnldm.utils package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">TorchNLDM</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">torchnldm.model.nldm</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for torchnldm.model.nldm</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">nn</span>
+
+<span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABC</span><span class="p">,</span> <span class="n">abstractmethod</span>
+<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span> <span class="nn">multimethod</span> <span class="kn">import</span> <span class="n">multimethod</span>
+
+<span class="kn">from</span> <span class="nn">..utils.addtypes</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">..utils.nn</span> <span class="kn">import</span> <span class="n">MLP</span>
+<span class="kn">from</span> <span class="nn">..utils.config</span> <span class="kn">import</span> <span class="n">ConfigBase</span> 
+<span class="kn">from</span> <span class="nn">..utils.model</span> <span class="kn">import</span> <span class="n">model_summary</span>
+<span class="kn">from</span> <span class="nn">..utils.ops</span> <span class="kn">import</span> <span class="n">timing</span>
+<span class="kn">from</span> <span class="nn">..utils.metrics</span> <span class="kn">import</span> <span class="n">error</span><span class="p">,</span> <span class="n">relative_error</span><span class="p">,</span> <span class="n">loss_criterion</span>
+<span class="kn">from</span> <span class="nn">..data</span> <span class="kn">import</span> <span class="n">DataLoader</span><span class="p">,</span> <span class="n">DataScaler</span>
+
+<span class="kn">from</span> <span class="nn">.nde</span> <span class="kn">import</span> <span class="n">NeuralODE</span><span class="p">,</span> <span class="n">NeuralSDE</span>
+<span class="kn">from</span> <span class="nn">.ae</span> <span class="kn">import</span> <span class="n">StateEncoder</span><span class="p">,</span> <span class="n">FieldEncoder</span><span class="p">,</span> <span class="n">StateDecoder</span><span class="p">,</span> <span class="n">FieldDecoder</span>
+
+<span class="c1"># Imports regarding the stability term in the loss</span>
+<span class="c1"># which has to be checked from a theoretical standpoint</span>
+<span class="c1">#from torch.func import jacrev, vmap</span>
+<span class="c1">#from torch.linalg import eigvals</span>
+
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">Neural Latent Dynamics Models</span>
+<span class="sd">&#39;&#39;&#39;</span>
+
+
+<div class="viewcode-block" id="NLDMBase"><a class="viewcode-back" href="../../../torchnldm.model.html#torchnldm.model.nldm.NLDMBase">[docs]</a><span class="k">class</span> <span class="nc">NLDMBase</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">,</span> <span class="n">ABC</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Neural Latent Dynamics Model abstract base class. It defines the basic structure of a NLDM, composed of an encoder, </span>
+<span class="sd">    a latent NDE and a decoder. It provides a common layout for NLDMs and template methods, based on abstract methods that</span>
+<span class="sd">    need to be implemented by subclasses, thus ensure compatibility with the Trainer and Evaluator classes.</span>
+<span class="sd">        </span>
+<span class="sd">    Args:</span>
+<span class="sd">        :encoder: (nn.Module), maps the state u(t) to its latent representation z(t).</span>
+<span class="sd">        :decoder: (nn.Module), maps the latent state z(t) to back to high-dimensions, namely u(t).</span>
+<span class="sd">        :latent_nde: (NeuralDE), evolves the latent state z(t), from t_0, to t_f.</span>
+<span class="sd">        :integration_method: (std), numerical scheme used for the latent time-integration (those available in torchdiffeq (ODEs), torchsde (SDEs)).</span>
+<span class="sd">        :adjoint: (bool), flag for enabling the adjoint method (https://arxiv.org/abs/1806.07366) </span>
+<span class="sd">        :device: (torch.device), device where the model will be loaded.            </span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> 
+                 <span class="n">encoder</span><span class="p">:</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">,</span> 
+                 <span class="n">decoder</span><span class="p">:</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">,</span> 
+                 <span class="n">latent_nde</span><span class="p">:</span> <span class="n">NeuralODE</span> <span class="ow">or</span> <span class="n">NeuralSDE</span><span class="p">,</span>
+                 <span class="n">nde_integration_method</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;euler&#39;</span><span class="p">,</span>
+                 <span class="n">nde_adjoint</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+                 <span class="n">device</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s1">&#39;cpu&#39;</span><span class="p">)):</span>
+        
+        <span class="nb">super</span><span class="p">(</span><span class="n">NLDMBase</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span> <span class="o">=</span> <span class="n">encoder</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">decoder</span> <span class="o">=</span> <span class="n">decoder</span>
+
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">latent_nde</span><span class="p">)</span> <span class="ow">in</span> <span class="p">(</span><span class="n">NeuralODE</span><span class="p">,</span> <span class="n">NeuralSDE</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">latent_nde</span> <span class="o">=</span> <span class="n">latent_nde</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">nde_type</span> <span class="o">=</span> <span class="n">latent_nde</span><span class="o">.</span><span class="n">nde_type</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;latent_nde type must be either NeuralODE or NeuralSDE, got instead </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">latent_nde</span><span class="p">)</span><span class="si">}</span><span class="s1">.&#39;</span><span class="p">)</span>
+        
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">__nde_integration_method</span> <span class="o">=</span> <span class="n">nde_integration_method</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__nde_adjoint</span> <span class="o">=</span> <span class="n">nde_adjoint</span> 
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">__latent_guidance</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__bidirectional</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">device</span> <span class="o">=</span> <span class="n">device</span>           
+        <span class="bp">self</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">nde_integration_method</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Integration method to perform latent integration.</span>
+<span class="sd">        Available methods are those implemented within TorchDiffEq (NeuralODE) or TorchSDE (NeuralSDE).</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__nde_integration_method</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">nde_adjoint</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Flag enabling the adjoint sensitivity method.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__nde_adjoint</span>
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">latent_guidance</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Flag enabling the latent guidance training scheme.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__latent_guidance</span>
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">bidirectional</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Flag enabling the bidirectional training scheme.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__bidirectional</span>
+
+    <span class="nd">@nde_integration_method</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">nde_integration_method</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nde_integration_method</span><span class="p">:</span><span class="nb">str</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">training</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Integration method cannot be changed at training time.&#39;</span><span class="p">)</span>  
+        <span class="k">else</span><span class="p">:</span> 
+            <span class="bp">self</span><span class="o">.</span><span class="n">__nde_integration_method</span> <span class="o">=</span> <span class="n">nde_integration_method</span>
+    
+    <span class="nd">@nde_adjoint</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">adjoint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mode</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">training</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Adjoint flag cannot be changed at training time.&#39;</span><span class="p">)</span>  
+        <span class="k">else</span><span class="p">:</span> 
+            <span class="bp">self</span><span class="o">.</span><span class="n">__nde_adjoint</span> <span class="o">=</span> <span class="n">mode</span>
+    
+    <span class="nd">@latent_guidance</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">latent_guidance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mode</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">training</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Training scheme cannot be changed at training time.&#39;</span><span class="p">)</span>  
+        <span class="k">else</span><span class="p">:</span> 
+            <span class="bp">self</span><span class="o">.</span><span class="n">__latent_guidance</span> <span class="o">=</span> <span class="n">mode</span>
+
+    <span class="nd">@bidirectional</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">bidirectional</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mode</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">training</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Training scheme cannot be changed at training time.&#39;</span><span class="p">)</span>  
+        <span class="k">else</span><span class="p">:</span> 
+            <span class="bp">self</span><span class="o">.</span><span class="n">__bidirectional</span> <span class="o">=</span> <span class="n">mode</span>
+
+<div class="viewcode-block" id="NLDMBase.summary"><a class="viewcode-back" href="../../../torchnldm.model.html#torchnldm.model.nldm.NLDMBase.summary">[docs]</a>    <span class="k">def</span> <span class="nf">summary</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Prints a summary of the model.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">model_summary</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="NLDMBase.load_scaler_from_dataset"><a class="viewcode-back" href="../../../torchnldm.model.html#torchnldm.model.nldm.NLDMBase.load_scaler_from_dataset">[docs]</a>    <span class="k">def</span> <span class="nf">load_scaler_from_dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">:</span> <span class="n">DataLoader</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Given a dataset, it loads the dataset scaler, to be used for internal pre- and </span>
+<span class="sd">        post-processing purposes, within the model.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">assert</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="s1">&#39;scaler&#39;</span><span class="p">),</span> <span class="s1">&#39;The provided dataset does not have a DataScaler object.&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scaler</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">scaler</span></div>
+
+<div class="viewcode-block" id="NLDMBase.load_scaler_from_checkpoint"><a class="viewcode-back" href="../../../torchnldm.model.html#torchnldm.model.nldm.NLDMBase.load_scaler_from_checkpoint">[docs]</a>    <span class="k">def</span> <span class="nf">load_scaler_from_checkpoint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">checkpoint</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Given a model checkpoint, it loads the dataset scaler, to be used for internal pre- and </span>
+<span class="sd">        post-processing purposes, within the model.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">assert</span> <span class="p">{</span><span class="s1">&#39;scaler_type&#39;</span><span class="p">,</span><span class="s1">&#39;scaler_params&#39;</span><span class="p">}</span> <span class="o">&lt;=</span> <span class="nb">set</span><span class="p">(</span><span class="n">checkpoint</span><span class="p">),</span> <span class="s1">&#39;The provided checkpoint does not have scaler_type and scaler_params.&#39;</span>
+        <span class="n">scaler_type</span> <span class="o">=</span> <span class="n">checkpoint</span><span class="p">[</span><span class="s1">&#39;scaler_type&#39;</span><span class="p">]</span>  
+        <span class="n">scaler_param</span> <span class="o">=</span> <span class="n">checkpoint</span><span class="p">[</span><span class="s1">&#39;scaler_params&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scaler</span> <span class="o">=</span> <span class="n">DataScaler</span><span class="p">(</span><span class="n">scaler_type</span><span class="p">,</span> <span class="n">scaler_param</span>
+                                 <span class="p">)</span></div>
+<div class="viewcode-block" id="NLDMBase.load_model_from_checkpoint"><a class="viewcode-back" href="../../../torchnldm.model.html#torchnldm.model.nldm.NLDMBase.load_model_from_checkpoint">[docs]</a>    <span class="k">def</span> <span class="nf">load_model_from_checkpoint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">checkpoint_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Given a model checkpoint, it loads the models&#39; parameters, and eventually additional available infos.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+        <span class="n">checkpoint</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">checkpoint_path</span><span class="p">,</span><span class="n">map_location</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">checkpoint</span><span class="p">[</span><span class="s1">&#39;model&#39;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="p">{</span><span class="s1">&#39;nde_integration_method&#39;</span><span class="p">}</span> <span class="o">&lt;=</span> <span class="nb">set</span><span class="p">(</span><span class="n">checkpoint</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">nde_integration_method</span> <span class="o">=</span> <span class="n">checkpoint</span><span class="p">[</span><span class="s1">&#39;nde_integration_method&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="p">{</span><span class="s1">&#39;scaler_type&#39;</span><span class="p">,</span><span class="s1">&#39;scaler_params&#39;</span><span class="p">}</span> <span class="o">&lt;=</span> <span class="nb">set</span><span class="p">(</span><span class="n">checkpoint</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">load_scaler_from_checkpoint</span><span class="p">(</span><span class="n">checkpoint</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="NLDMBase.forward"><a class="viewcode-back" href="../../../torchnldm.model.html#torchnldm.model.nldm.NLDMBase.forward">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u0</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">mut0</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">t</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Abstract method, must be overridden by subclasses, implementing the inference behavior of the model.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="NLDMBase.loss_criterion"><a class="viewcode-back" href="../../../torchnldm.model.html#torchnldm.model.nldm.NLDMBase.loss_criterion">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">loss_criterion</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ut</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">ut_pred</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Abstract method, must be overridden by subclasses, defining the loss criterion for the loss computation.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="NLDMBase.loss"><a class="viewcode-back" href="../../../torchnldm.model.html#torchnldm.model.nldm.NLDMBase.loss">[docs]</a>    <span class="nd">@abstractmethod</span>    
+    <span class="k">def</span> <span class="nf">loss</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Abstract method, must be overridden by subclasses, implementing the loss computation algorithm used in the training routine.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="NLDMBase.get_batch_loss"><a class="viewcode-back" href="../../../torchnldm.model.html#torchnldm.model.nldm.NLDMBase.get_batch_loss">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">get_batch_loss</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">:</span> <span class="n">DataLoader</span> <span class="p">,</span> <span class="n">section_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">t0_index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">batch_sizes</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Abstract method, must be overridden by subclasses, implementing the batched loss computation.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">pass</span></div>
+    
+<div class="viewcode-block" id="NLDMBase.predict_trajectory"><a class="viewcode-back" href="../../../torchnldm.model.html#torchnldm.model.nldm.NLDMBase.predict_trajectory">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="nd">@torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">()</span>
+    <span class="k">def</span> <span class="nf">predict_trajectory</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">:</span> <span class="n">DataLoader</span><span class="p">,</span> 
+                           <span class="n">t0_index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span><span class="n">param_index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+                           <span class="n">timesteps</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span><span class="n">enable_scaling</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> 
+                           <span class="n">return_inputs</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">]:</span>   
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Abstract method, must be overridden by subclasses, implementing the single trajectory prediction steps.</span>
+<span class="sd">        &#39;&#39;&#39;</span>     
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="NLDMBase.training_epoch"><a class="viewcode-back" href="../../../torchnldm.model.html#torchnldm.model.nldm.NLDMBase.training_epoch">[docs]</a>    <span class="k">def</span> <span class="nf">training_epoch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> 
+                       <span class="n">dataset</span><span class="p">:</span> <span class="n">DataLoader</span><span class="p">,</span> 
+                       <span class="n">optimizer</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="p">,</span> 
+                       <span class="n">batch_sizes</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> 
+                       <span class="n">enable_amp</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>        
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Template method defining the general training routine for one epoch. It is based on the abstract methods defining</span>
+<span class="sd">        the specific NLDM behavior, which need to be implemented in the child classes, inheriting from the base class.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            :dataset: (DataLoader), dataset object used for training purposes.</span>
+<span class="sd">            :optimizer: (torch.optim), torch optimizer (e.g. torch.optim.Adam).</span>
+<span class="sd">            :batch_sizes: (list[int]), list of batch sizes, more specifically [batch_size_params, batch_size_timesteps, batch_size_nodes].</span>
+<span class="sd">            :enable_amp: (bool), flag for enabling Automatic Mixed Precision.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            :epoch_loss: (float), value of the loss.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>
+        
+        <span class="k">if</span> <span class="n">enable_amp</span><span class="p">:</span>
+            <span class="c1"># Scale gradients if Automatic Mixed Precision is enabled</span>
+            <span class="n">grad_scaler</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">amp</span><span class="o">.</span><span class="n">GradScaler</span><span class="p">()</span>
+
+        <span class="n">section_id</span><span class="p">,</span> <span class="n">sub_trajectories_t0_indexes</span><span class="p">,</span> <span class="n">n_subtrajectories</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">get_train_t0_indices</span><span class="p">(</span><span class="n">timesteps</span><span class="o">=</span><span class="n">batch_sizes</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">epoch_loss</span> <span class="o">=</span> <span class="mf">0.</span>
+
+        <span class="k">for</span> <span class="n">t0_index</span> <span class="ow">in</span> <span class="n">sub_trajectories_t0_indexes</span><span class="p">:</span>
+            
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
+                
+                <span class="k">if</span> <span class="n">enable_amp</span><span class="p">:</span>
+                    <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">amp</span><span class="o">.</span><span class="n">autocast</span><span class="p">():</span>
+                        <span class="n">loss</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_batch_loss</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">section_id</span><span class="p">,</span> <span class="n">t0_index</span><span class="p">,</span> <span class="n">batch_sizes</span><span class="p">)</span>
+                        <span class="n">grad_scaler</span><span class="o">.</span><span class="n">scale</span><span class="p">(</span><span class="n">loss</span><span class="p">)</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
+                        <span class="n">grad_scaler</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">optimizer</span><span class="p">)</span>
+                        <span class="n">grad_scaler</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">loss</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_batch_loss</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">section_id</span><span class="p">,</span> <span class="n">t0_index</span><span class="p">,</span> <span class="n">batch_sizes</span><span class="p">)</span>
+                    <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
+                    <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+
+                <span class="n">epoch_loss</span> <span class="o">+=</span> <span class="n">loss</span><span class="o">.</span><span class="n">item</span><span class="p">()</span><span class="o">/</span><span class="n">n_subtrajectories</span>
+
+            <span class="k">except</span> <span class="ne">RuntimeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="k">if</span> <span class="s1">&#39;out of memory&#39;</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">):</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;WARNING: ran out of memory, skipping batch&#39;</span><span class="p">)</span>
+                    <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">():</span>
+                        <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">grad</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                            <span class="k">del</span> <span class="n">p</span><span class="o">.</span><span class="n">grad</span>
+                    <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">empty_cache</span><span class="p">()</span>
+                    <span class="k">continue</span>
+        
+        <span class="k">return</span> <span class="n">epoch_loss</span></div>
+    
+<div class="viewcode-block" id="NLDMBase.validation_epoch"><a class="viewcode-back" href="../../../torchnldm.model.html#torchnldm.model.nldm.NLDMBase.validation_epoch">[docs]</a>    <span class="nd">@torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">()</span>
+    <span class="k">def</span> <span class="nf">validation_epoch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> 
+                         <span class="n">dataset</span><span class="p">:</span> <span class="n">DataLoader</span><span class="p">,</span> 
+                         <span class="n">batch_sizes</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
+                         <span class="n">enable_amp</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>        
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Template method defining the general validation routine for one epoch. It is based on the abstract methods defining</span>
+<span class="sd">        the specific NLDM behavior, which need to be implemented in the child classes, inheriting from the base class.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            :dataset: (DataLoader), dataset object used for training purposes.</span>
+<span class="sd">            :batch_sizes: (list[int]), list of batch sizes, more specifically [batch_size_params, batch_size_timesteps, batch_size_nodes].</span>
+<span class="sd">            :enable_amp: (bool), flag for enabling Automatic Mixed Precision.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            :epoch_loss: (float), value of the loss.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">assert</span> <span class="s1">&#39;validation&#39;</span> <span class="ow">in</span> <span class="n">dataset</span><span class="o">.</span><span class="n">sections</span><span class="p">,</span> <span class="s1">&#39;Validation cannot be performed: provided dataset is not splitted, time_validation_split must be specified when loading the dataset.&#39;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+        <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">amp</span><span class="o">.</span><span class="n">autocast</span><span class="p">(</span><span class="n">enabled</span><span class="o">=</span><span class="n">enable_amp</span><span class="p">):</span>
+            <span class="n">epoch_loss</span> <span class="o">=</span> <span class="mf">0.</span>
+            <span class="n">n_subtrajectories</span> <span class="o">=</span>  <span class="n">dataset</span><span class="o">.</span><span class="n">Nt</span> <span class="o">-</span> <span class="n">dataset</span><span class="o">.</span><span class="n">Nt_train</span> <span class="o">-</span> <span class="n">batch_sizes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+            <span class="k">for</span> <span class="n">t0_index</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_subtrajectories</span><span class="p">):</span>
+                <span class="n">loss</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_batch_loss</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="s1">&#39;validation&#39;</span><span class="p">,</span> <span class="n">t0_index</span><span class="p">,</span> <span class="n">batch_sizes</span><span class="p">)</span>
+                <span class="n">epoch_loss</span> <span class="o">+=</span> <span class="n">loss</span><span class="o">.</span><span class="n">item</span><span class="p">()</span><span class="o">/</span><span class="n">n_subtrajectories</span>
+            
+        <span class="k">return</span> <span class="n">epoch_loss</span></div>
+
+<div class="viewcode-block" id="NLDMBase.evaluate"><a class="viewcode-back" href="../../../torchnldm.model.html#torchnldm.model.nldm.NLDMBase.evaluate">[docs]</a>    <span class="nd">@torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">()</span>
+    <span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> 
+                 <span class="n">dataset</span><span class="p">:</span> <span class="n">DataLoader</span><span class="p">,</span> 
+                 <span class="n">t0_index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+                 <span class="n">param_index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+                 <span class="n">timesteps</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+                 <span class="n">enable_scaling</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>     
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Template method defining the general evaluation routine for a single trajectory prediction. </span>
+<span class="sd">        It is based on the predict_trajectory abstract method.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            :dataset: (DataLoader), dataset object used for training purposes.</span>
+<span class="sd">            :t0_index: (int), index of the initial value (&lt;Nt).</span>
+<span class="sd">            :param_index: (int), index of the parameter instance (&lt;N).</span>
+<span class="sd">            :timesteps: (int), length of the prediction window (&lt;N).</span>
+<span class="sd">            :enable_scaling: (bool), flag to enable pre- and post-processing via the model&#39;s internal scaler.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            :epoch_loss: (float), value of the loss.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+        <span class="n">ut</span><span class="p">,</span> <span class="n">ut_pred</span><span class="p">,</span> <span class="n">pred_t</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">predict_trajectory</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">t0_index</span><span class="p">,</span> <span class="n">param_index</span><span class="p">,</span> <span class="n">timesteps</span><span class="p">,</span> <span class="n">enable_scaling</span><span class="p">)</span>
+        <span class="n">pred_error</span> <span class="o">=</span> <span class="n">error</span><span class="p">(</span><span class="n">ut</span><span class="p">,</span> <span class="n">ut_pred</span><span class="p">)</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+        <span class="n">pred_rel_error</span> <span class="o">=</span> <span class="n">relative_error</span><span class="p">(</span><span class="n">ut</span><span class="p">,</span> <span class="n">ut_pred</span><span class="p">)</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">pred_error</span><span class="p">,</span> <span class="n">pred_rel_error</span><span class="p">,</span> <span class="n">pred_t</span></div></div>
+    
+
+<div class="viewcode-block" id="NLDMConfig"><a class="viewcode-back" href="../../../torchnldm.model.html#torchnldm.model.nldm.NLDMConfig">[docs]</a><span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">NLDMConfig</span><span class="p">(</span><span class="n">ConfigBase</span><span class="p">):</span>
+    <span class="c1"># Dimensions</span>
+    <span class="n">Nh</span><span class="p">:</span> <span class="nb">int</span> 
+    <span class="n">Np</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">latent_dim</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">state_channels</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="c1"># Autoencoder</span>
+    <span class="n">ae_conv_dim</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">ae_activation</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;elu&#39;</span>
+    <span class="n">ae_residual_blocks</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">encoder_conv_depth</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">encoder_conv_hidden_channels</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">encoder_reshape_dim</span><span class="p">:</span> <span class="nb">int</span> <span class="ow">or</span> <span class="nb">tuple</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">encoder_mlp_state_hidden_dim</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">256</span>
+    <span class="n">encoder_param_emb</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;multiply&#39;</span>
+    <span class="n">encoder_mlp_param_depth</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">encoder_mlp_param_hidden_dim</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">256</span>
+    <span class="n">encoder_mlp_time_depth</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">encoder_mlp_time_hidden_dim</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">256</span>
+    <span class="n">decoder_conv_depth</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">decoder_conv_hidden_channels</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">32</span>
+    <span class="n">decoder_reshape_dim</span><span class="p">:</span> <span class="nb">int</span> <span class="ow">or</span> <span class="nb">tuple</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">decoder_mlp_state_hidden_dim</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">256</span>
+    <span class="c1"># Neural Differential Equation</span>
+    <span class="n">nde_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;ode&#39;</span>
+    <span class="n">nde_depth</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">nde_hidden_dim</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">256</span>
+    <span class="n">nde_integration_method</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;euler&#39;</span>
+    <span class="n">nde_adjoint</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">nde_activation</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;elu&#39;</span>
+    <span class="c1"># device</span>
+    <span class="n">device</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s1">&#39;cpu&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="NLDM"><a class="viewcode-back" href="../../../torchnldm.model.html#torchnldm.model.nldm.NLDM">[docs]</a><span class="k">class</span> <span class="nc">NLDM</span><span class="p">(</span><span class="n">NLDMBase</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Class implementing the spatially-discrete NLDM formulation.</span>
+<span class="sd">        </span>
+<span class="sd">    Args:</span>
+<span class="sd">        :config: (NLDMConfig): NLDM configuration class.</span>
+<span class="sd">    </span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="nd">@multimethod</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">NLDMConfig</span><span class="p">):</span>
+            
+        <span class="bp">self</span><span class="o">.</span><span class="n">__parse_config</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+
+        <span class="n">encoder</span> <span class="o">=</span> <span class="n">StateEncoder</span><span class="p">(</span><span class="n">Nh</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Nh</span><span class="p">,</span>
+                               <span class="n">Np</span><span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Np</span><span class="p">,</span>
+                               <span class="n">latent_dim</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">latent_dim</span><span class="p">,</span>
+                               <span class="n">conv_dim</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ae_conv_dim</span><span class="p">,</span>
+                               <span class="n">conv_depth</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoder_conv_depth</span><span class="p">,</span>
+                               <span class="n">in_channels</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">state_channels</span><span class="p">,</span>
+                               <span class="n">hidden_channels</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoder_conv_hidden_channels</span><span class="p">,</span>
+                               <span class="n">reshape_dim</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoder_reshape_dim</span><span class="p">,</span>
+                               <span class="n">residual_blocks</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ae_residual_blocks</span><span class="p">,</span>
+                               <span class="n">mlp_state_hidden_dim</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoder_mlp_state_hidden_dim</span><span class="p">,</span>
+                               <span class="n">param_emb</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoder_param_emb</span><span class="p">,</span>
+                               <span class="n">mlp_param_hidden_dim</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoder_mlp_param_hidden_dim</span><span class="p">,</span>
+                               <span class="n">mlp_param_depth</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoder_mlp_param_depth</span><span class="p">,</span>
+                               <span class="n">mlp_time_hidden_dim</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoder_mlp_time_hidden_dim</span><span class="p">,</span>
+                               <span class="n">mlp_time_depth</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoder_mlp_time_depth</span><span class="p">,</span>
+                               <span class="n">activation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ae_activation</span><span class="p">)</span>
+
+        <span class="n">decoder</span> <span class="o">=</span> <span class="n">StateDecoder</span><span class="p">(</span><span class="n">Nh</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Nh</span><span class="p">,</span>
+                               <span class="n">latent_dim</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">latent_dim</span><span class="p">,</span>
+                               <span class="n">conv_dim</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ae_conv_dim</span><span class="p">,</span>
+                               <span class="n">conv_depth</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">decoder_conv_depth</span><span class="p">,</span>
+                               <span class="n">out_channels</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">state_channels</span><span class="p">,</span>
+                               <span class="n">hidden_channels</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">decoder_conv_hidden_channels</span><span class="p">,</span>
+                               <span class="n">reshape_dim</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">decoder_reshape_dim</span><span class="p">,</span>
+                               <span class="n">residual_blocks</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ae_residual_blocks</span><span class="p">,</span>
+                               <span class="n">mlp_hidden_dim</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">decoder_mlp_state_hidden_dim</span><span class="p">,</span>
+                               <span class="n">activation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ae_activation</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">nde_type</span> <span class="o">==</span> <span class="s1">&#39;ode&#39;</span><span class="p">:</span>
+            <span class="n">latent_nde</span> <span class="o">=</span> <span class="n">NeuralODE</span><span class="p">(</span><span class="n">MLP</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">latent_dim</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">latent_dim</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nde_hidden_dim</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nde_depth</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nde_activation</span><span class="p">))</span> 
+        <span class="k">elif</span> <span class="n">config</span><span class="o">.</span><span class="n">nde_type</span> <span class="o">==</span> <span class="s1">&#39;sde&#39;</span><span class="p">:</span>
+            <span class="n">latent_nde</span> <span class="o">=</span> <span class="n">NeuralSDE</span><span class="p">(</span><span class="n">MLP</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">latent_dim</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">latent_dim</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nde_hidden_dim</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nde_depth</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nde_activation</span><span class="p">),</span>
+                                   <span class="n">MLP</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">latent_dim</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">latent_dim</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nde_hidden_dim</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nde_depth</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nde_activation</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;nde_type must be either &quot;ode&quot; or &quot;sde&quot;, got instead </span><span class="si">{</span><span class="n">config</span><span class="o">.</span><span class="n">nde_type</span><span class="si">}</span><span class="s1">.&#39;</span><span class="p">)</span> 
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">encoder</span> <span class="o">=</span> <span class="n">encoder</span><span class="p">,</span> 
+                         <span class="n">decoder</span> <span class="o">=</span> <span class="n">decoder</span><span class="p">,</span> 
+                         <span class="n">latent_nde</span> <span class="o">=</span> <span class="n">latent_nde</span><span class="p">,</span> 
+                         <span class="n">nde_integration_method</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">nde_integration_method</span><span class="p">,</span> 
+                         <span class="n">nde_adjoint</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">nde_adjoint</span><span class="p">,</span> 
+                         <span class="n">device</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+
+    <span class="nd">@multimethod</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">encoder</span><span class="p">:</span> <span class="n">StateEncoder</span> <span class="ow">or</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">,</span>
+                 <span class="n">decoder</span><span class="p">:</span> <span class="n">StateDecoder</span> <span class="ow">or</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">,</span>
+                 <span class="n">latent_nde</span><span class="p">:</span> <span class="n">NeuralODE</span> <span class="ow">or</span> <span class="n">NeuralSDE</span><span class="p">,</span>
+                 <span class="n">nde_integration_method</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;euler&#39;</span><span class="p">,</span>
+                 <span class="n">nde_adjoint</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+                 <span class="n">device</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s1">&#39;cpu&#39;</span><span class="p">)):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Overloaded constructor, meant for modular instantiation, by providing each submodule</span>
+<span class="sd">        separately, without relying on the config object.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="k">if</span> <span class="kc">None</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="n">encoder</span><span class="p">,</span> <span class="n">decoder</span><span class="p">,</span> <span class="n">latent_nde</span><span class="p">):</span>
+            <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">encoder</span> <span class="o">=</span> <span class="n">encoder</span><span class="p">,</span> 
+                             <span class="n">decoder</span> <span class="o">=</span> <span class="n">decoder</span><span class="p">,</span> 
+                             <span class="n">latent_nde</span> <span class="o">=</span> <span class="n">latent_nde</span><span class="p">,</span> 
+                             <span class="n">nde_integration_method</span> <span class="o">=</span> <span class="n">nde_integration_method</span><span class="p">,</span> 
+                             <span class="n">nde_adjoint</span> <span class="o">=</span> <span class="n">nde_adjoint</span><span class="p">,</span> 
+                             <span class="n">device</span> <span class="o">=</span> <span class="n">device</span><span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span> 
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;encoder, decoder and latent_nde must be passed to instantiate a NLDM.&#39;</span><span class="p">)</span>
+        
+    <span class="k">def</span> <span class="nf">__parse_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">config</span><span class="p">:</span> <span class="n">NLDMConfig</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Nh</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">Nh</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Np</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">Np</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">latent_dim</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">latent_dim</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">state_channels</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">state_channels</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ae_conv_dim</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">ae_conv_dim</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">encoder_conv_depth</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">encoder_conv_depth</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">encoder_conv_hidden_channels</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">encoder_conv_hidden_channels</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">encoder_reshape_dim</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">encoder_reshape_dim</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">encoder_mlp_state_hidden_dim</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">encoder_mlp_state_hidden_dim</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">encoder_param_emb</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">encoder_param_emb</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">encoder_mlp_param_hidden_dim</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">encoder_mlp_param_hidden_dim</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">encoder_mlp_param_depth</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">encoder_mlp_param_depth</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">encoder_mlp_time_hidden_dim</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">encoder_mlp_time_hidden_dim</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">encoder_mlp_time_depth</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">encoder_mlp_time_depth</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">decoder_conv_depth</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">decoder_conv_depth</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">decoder_conv_hidden_channels</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">decoder_conv_hidden_channels</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">decoder_reshape_dim</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">decoder_reshape_dim</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">decoder_mlp_state_hidden_dim</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">decoder_mlp_state_hidden_dim</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ae_residual_blocks</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">ae_residual_blocks</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ae_activation</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">ae_activation</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nde_depth</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">nde_depth</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nde_hidden_dim</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">nde_hidden_dim</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nde_activation</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">nde_activation</span>
+
+<div class="viewcode-block" id="NLDM.add_POD_layer"><a class="viewcode-back" href="../../../torchnldm.model.html#torchnldm.model.nldm.NLDM.add_POD_layer">[docs]</a>    <span class="k">def</span> <span class="nf">add_POD_layer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">U</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Method for adding a POD layer, with U its projection matrix, provided as a torch.tensor.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">U</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Parameter</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="n">requires_grad</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="NLDM.POD_layer"><a class="viewcode-back" href="../../../torchnldm.model.html#torchnldm.model.nldm.NLDM.POD_layer">[docs]</a>    <span class="k">def</span> <span class="nf">POD_layer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">position</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;input&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Method for handling the POD layer, to perform forward and inverse projection, depending</span>
+<span class="sd">        on the provided &#39;position&#39; argument.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            :u: (Tensor): input to be projected</span>
+<span class="sd">            :position: (str): if &#39;input&#39; it applies U, while if &#39;output&#39; U^T (transposed) is applied.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;U&#39;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">position</span> <span class="o">==</span> <span class="s1">&#39;input&#39;</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">u</span><span class="nd">@self</span><span class="o">.</span><span class="n">U</span>
+            <span class="k">elif</span> <span class="n">position</span> <span class="o">==</span> <span class="s1">&#39;output&#39;</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">u</span><span class="nd">@self</span><span class="o">.</span><span class="n">U</span><span class="o">.</span><span class="n">T</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">u</span></div>
+    
+<div class="viewcode-block" id="NLDM.preprocess"><a class="viewcode-back" href="../../../torchnldm.model.html#torchnldm.model.nldm.NLDM.preprocess">[docs]</a>    <span class="k">def</span> <span class="nf">preprocess</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u0</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">mut0</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">t</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Performs preprocessing via the models&#39; DataScaler, over the input features.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">u0</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scaler</span><span class="o">.</span><span class="n">scale_feature</span><span class="p">(</span><span class="n">u0</span><span class="p">,</span> <span class="s1">&#39;u&#39;</span><span class="p">)</span>
+        <span class="n">mut0</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scaler</span><span class="o">.</span><span class="n">scale_feature</span><span class="p">(</span><span class="n">mut0</span><span class="p">,</span> <span class="s1">&#39;mu&#39;</span><span class="p">)</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scaler</span><span class="o">.</span><span class="n">scale_feature</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="s1">&#39;t&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">u0</span><span class="p">,</span> <span class="n">mut0</span><span class="p">,</span> <span class="n">t</span></div>
+
+<div class="viewcode-block" id="NLDM.postprocess"><a class="viewcode-back" href="../../../torchnldm.model.html#torchnldm.model.nldm.NLDM.postprocess">[docs]</a>    <span class="k">def</span> <span class="nf">postprocess</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ut</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Performs postprocessing via the models&#39; DataScaler, over the models&#39; output.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">scaler</span><span class="o">.</span><span class="n">scale_feature</span><span class="p">(</span><span class="n">ut</span><span class="p">,</span> <span class="s1">&#39;u&#39;</span><span class="p">,</span> <span class="n">inverse</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span></div>
+    
+<div class="viewcode-block" id="NLDM.forward"><a class="viewcode-back" href="../../../torchnldm.model.html#torchnldm.model.nldm.NLDM.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> 
+                <span class="n">u0</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> 
+                <span class="n">mut0</span><span class="p">:</span><span class="n">Tensor</span><span class="p">,</span> 
+                <span class="n">t</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> 
+                <span class="n">return_latent</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> 
+                <span class="n">preprocess</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> 
+                <span class="n">postprocess</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span> <span class="ow">or</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Forward method defining the inference behavior of the NLDM.</span>
+
+<span class="sd">        Args: </span>
+<span class="sd">            :u0: (Tensor): discretized state initial value, of shape = (B,Nh).</span>
+<span class="sd">            :mut0: (Tensor): parameters tensor, concatenated with the initial timestep (as provided by PDEGen), of shape = (B,Np).</span>
+<span class="sd">            :t: (Tensor): 1d tensor of timesteps to perform latent integration, of shape (T,).</span>
+<span class="sd">            :return_latent: (bool): flag to return the latent dynamics z(t), evalued at the timesteps t.</span>
+<span class="sd">            :preprocess: (bool): flag to perform input features scaling.</span>
+<span class="sd">            :postprocess: (bool): flag to perform output scaling.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            :ut: (Tensor): evolution of the high-dimensional state, of shape shape = (T,B,Nh).</span>
+<span class="sd">            :zt: (Tensor): evolution of the latent state,  of shape shape = (T,B,latent_dim).</span>
+
+<span class="sd">        Shapes:</span>
+<span class="sd">            - B: batch size</span>
+<span class="sd">            - Nh: degrees of freedom of the discretized state</span>
+<span class="sd">            - T: number of timesteps involved in the prediction (length of the prediction window)</span>
+<span class="sd">            - latent_dim: dimension of the latent state vector</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="n">preprocess</span><span class="p">:</span>
+            <span class="n">u0</span><span class="p">,</span> <span class="n">mut0</span><span class="p">,</span> <span class="n">t</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">preprocess</span><span class="p">(</span><span class="n">u0</span><span class="p">,</span> <span class="n">mut0</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
+        
+        <span class="n">u0</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">POD_layer</span><span class="p">(</span><span class="n">u0</span><span class="p">,</span> <span class="s1">&#39;input&#39;</span><span class="p">)</span>
+        <span class="n">z0</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span><span class="p">(</span><span class="n">u0</span><span class="p">,</span> <span class="n">mut0</span><span class="p">)</span>
+        <span class="n">zt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">latent_nde</span><span class="p">(</span><span class="n">z0</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nde_integration_method</span><span class="p">)</span>
+        <span class="n">ut</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">decoder</span><span class="p">(</span><span class="n">zt</span><span class="p">)</span>
+        <span class="n">ut</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">POD_layer</span><span class="p">(</span><span class="n">ut</span><span class="p">,</span> <span class="s1">&#39;output&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">postprocess</span><span class="p">:</span>
+            <span class="n">ut</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">postprocess</span><span class="p">(</span><span class="n">ut</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">(</span><span class="n">ut</span><span class="p">,</span> <span class="n">zt</span><span class="p">)</span> <span class="k">if</span> <span class="n">return_latent</span> <span class="k">else</span> <span class="n">ut</span></div>
+        
+<div class="viewcode-block" id="NLDM.loss_criterion"><a class="viewcode-back" href="../../../torchnldm.model.html#torchnldm.model.nldm.NLDM.loss_criterion">[docs]</a>    <span class="k">def</span> <span class="nf">loss_criterion</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ut</span><span class="p">,</span> <span class="n">ut_pred</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">loss_criterion</span><span class="p">(</span><span class="n">ut</span><span class="p">,</span> <span class="n">ut_pred</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="NLDM.loss"><a class="viewcode-back" href="../../../torchnldm.model.html#torchnldm.model.nldm.NLDM.loss">[docs]</a>    <span class="k">def</span> <span class="nf">loss</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> 
+             <span class="n">u0</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> 
+             <span class="n">mut0</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> 
+             <span class="n">t</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> 
+             <span class="n">ut</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> 
+             <span class="n">mut</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+        
+        <span class="n">u0</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">POD_layer</span><span class="p">(</span><span class="n">u0</span><span class="p">,</span> <span class="s1">&#39;input&#39;</span><span class="p">)</span>
+        <span class="n">ut_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">POD_layer</span><span class="p">(</span><span class="n">ut</span><span class="p">,</span> <span class="s1">&#39;input&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">latent_guidance</span><span class="p">:</span>
+            <span class="n">zt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span><span class="p">(</span><span class="n">ut_</span><span class="p">,</span> <span class="n">mut</span><span class="p">)</span>
+            <span class="n">ut_pred</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">decoder</span><span class="p">(</span><span class="n">zt</span><span class="p">)</span>
+            <span class="n">ut_pred</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">POD_layer</span><span class="p">(</span><span class="n">ut_pred</span><span class="p">,</span> <span class="s1">&#39;output&#39;</span><span class="p">)</span>
+            <span class="n">loss</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">loss_criterion</span><span class="p">(</span><span class="n">ut</span><span class="p">,</span> <span class="n">ut_pred</span><span class="p">)</span> <span class="c1"># u0,...,uT autoencoding loss term</span>
+            <span class="n">zt_pred</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">latent_nde</span><span class="p">(</span><span class="n">zt</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="o">...</span><span class="p">],</span> <span class="n">t</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nde_integration_method</span><span class="p">)</span> 
+            <span class="n">loss</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">loss_criterion</span><span class="p">(</span><span class="n">zt</span><span class="p">,</span> <span class="n">zt_pred</span><span class="p">)</span> <span class="c1"># latent guiding loss term</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">bidirectional</span><span class="p">:</span>
+                <span class="n">t_backward</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">flip</span><span class="p">(</span><span class="n">t</span><span class="p">,[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="n">zt_backward</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">flip</span><span class="p">(</span><span class="n">zt</span><span class="p">,[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="n">zt_backward_pred</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">latent_nde</span><span class="p">(</span><span class="n">zt</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="o">...</span><span class="p">],</span> <span class="n">t_backward</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nde_integration_method</span><span class="p">)</span> 
+                <span class="n">loss</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">loss_criterion</span><span class="p">(</span><span class="n">zt_backward</span><span class="p">,</span> <span class="n">zt_backward_pred</span><span class="p">)</span> <span class="c1"># latent backward dynamics loss term</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ut_pred</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">u0</span><span class="p">,</span> <span class="n">mut0</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
+            <span class="n">loss</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">loss_criterion</span><span class="p">(</span><span class="n">ut</span><span class="p">,</span> <span class="n">ut_pred</span><span class="p">)</span> <span class="c1"># observable dynamics loss term</span>
+            <span class="n">loss</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">loss_criterion</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">decoder</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">encoder</span><span class="p">(</span><span class="n">u0</span><span class="p">,</span> <span class="n">mut0</span><span class="p">)),</span><span class="n">u0</span><span class="p">)</span> <span class="c1"># u0 autoencoding loss term</span>
+            
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">bidirectional</span><span class="p">:</span>
+                <span class="n">t_backward</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">flip</span><span class="p">(</span><span class="n">t</span><span class="p">,[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="n">ut_backward</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">flip</span><span class="p">(</span><span class="n">ut_pred</span><span class="p">,[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="n">ut_backward_pred</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">ut_backward</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="o">...</span><span class="p">],</span> <span class="n">mut</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="o">...</span><span class="p">],</span> <span class="n">t_backward</span><span class="p">)</span>
+                <span class="n">loss</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">loss_criterion</span><span class="p">(</span><span class="n">ut_backward</span><span class="p">,</span> <span class="n">ut_backward_pred</span><span class="p">)</span> <span class="c1"># observable backward dynamics loss term</span>
+
+        <span class="c1"># ** To be assessed from a theoretical point of view **</span>
+        <span class="c1"># Stability term</span>
+        <span class="c1"># implemented as {f(z*)==0}*max(λ(Jf(z*)),0)</span>
+        <span class="c1">#z0 = zt[0,...]</span>
+        <span class="c1">#loss += (torch.isclose(self.latent_nde.f.f(z0),torch.zeros_like(z0)).detach()*torch.max(eigvals(vmap(jacrev(self.latent_nde.f.f))(z0)).real, torch.zeros_like(z0))).sum()</span>
+
+        <span class="k">return</span> <span class="n">loss</span></div>
+
+<div class="viewcode-block" id="NLDM.get_batch_loss"><a class="viewcode-back" href="../../../torchnldm.model.html#torchnldm.model.nldm.NLDM.get_batch_loss">[docs]</a>    <span class="k">def</span> <span class="nf">get_batch_loss</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> 
+                       <span class="n">dataset</span><span class="p">:</span> <span class="n">DataLoader</span><span class="p">,</span> 
+                       <span class="n">section_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> 
+                       <span class="n">t0_index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> 
+                       <span class="n">batch_sizes</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+        
+        <span class="n">batch_size_params</span><span class="p">,</span> <span class="n">batch_size_timesteps</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">batch_sizes</span>
+        <span class="n">u0</span><span class="p">,</span> <span class="n">mut0</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">ut</span><span class="p">,</span> <span class="n">mut</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">get_batch</span><span class="p">(</span><span class="n">section_id</span><span class="p">,</span> <span class="n">t0_index</span><span class="p">,</span> <span class="n">batch_size_params</span><span class="p">,</span> <span class="n">batch_size_timesteps</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">loss</span><span class="p">(</span><span class="n">u0</span><span class="p">,</span> <span class="n">mut0</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">ut</span><span class="p">,</span> <span class="n">mut</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="NLDM.predict_trajectory"><a class="viewcode-back" href="../../../torchnldm.model.html#torchnldm.model.nldm.NLDM.predict_trajectory">[docs]</a>    <span class="nd">@torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">()</span>
+    <span class="k">def</span> <span class="nf">predict_trajectory</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> 
+            <span class="n">dataset</span><span class="p">:</span> <span class="n">DataLoader</span><span class="p">,</span> 
+            <span class="n">t0_index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+            <span class="n">param_index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+            <span class="n">timesteps</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+            <span class="n">enable_scaling</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+            <span class="n">return_inputs</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">]:</span>
+            
+        <span class="n">u0</span><span class="p">,</span> <span class="n">mut0</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">ut</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">get_trajectory</span><span class="p">(</span><span class="s1">&#39;complete&#39;</span><span class="p">,</span> <span class="n">t0_index</span><span class="p">,</span> <span class="n">param_index</span><span class="p">,</span> <span class="n">timesteps</span><span class="p">)</span>
+        <span class="n">ut_pred</span><span class="p">,</span> <span class="n">pred_t</span> <span class="o">=</span> <span class="n">timing</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">forward</span><span class="p">)(</span><span class="n">u0</span><span class="p">,</span> <span class="n">mut0</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">preprocess</span> <span class="o">=</span> <span class="n">enable_scaling</span><span class="p">,</span> <span class="n">postprocess</span> <span class="o">=</span> <span class="n">enable_scaling</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">ut</span><span class="p">,</span> <span class="n">ut_pred</span><span class="p">,</span> <span class="n">pred_t</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">mut0</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span> <span class="k">if</span> <span class="n">return_inputs</span> <span class="k">else</span> <span class="p">(</span><span class="n">ut</span><span class="p">,</span> <span class="n">ut_pred</span><span class="p">,</span> <span class="n">pred_t</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="NLDFConfig"><a class="viewcode-back" href="../../../torchnldm.model.html#torchnldm.model.nldm.NLDFConfig">[docs]</a><span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">NLDFConfig</span><span class="p">(</span><span class="n">ConfigBase</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Neural Latent Dynamics Field configuration class.</span>
+<span class="sd">        </span>
+<span class="sd">    Attributes:</span>
+<span class="sd">        :n: (int): dimension u(x,t;mu) codomain.</span>
+<span class="sd">        :d: (int): number of dimension of spatial domain (x).</span>
+<span class="sd">        :Np: (int): total number of parameters + time (Nmu + 1)</span>
+<span class="sd">        :latent_dim: (int): dimension of the latent state z(t).</span>
+<span class="sd">        :nde_type: (str): type of latent neural differential equation (ode/sde)</span>
+<span class="sd">        :integration_method: (std): numerical scheme used for the latent NDE time-integration.</span>
+<span class="sd">        :adjoint: (bool): flag for enabling the adjoint method (https://arxiv.org/abs/1806.07366) </span>
+<span class="sd">        :device: (torch.device): cpu/gpu(cuda)</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="c1"># Dimensions</span>
+    <span class="n">n</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">d</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">Np</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">latent_dim</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="c1"># Autoencoder</span>
+    <span class="n">ae_activation</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;elu&#39;</span>
+    <span class="n">encoder_depth</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">encoder_hidden_dim</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">256</span>
+    <span class="n">encoder_architecture</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;hadamard&#39;</span>
+    <span class="n">decoder_depth</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">decoder_hidden_dim</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">256</span>
+    <span class="n">decoder_architecture</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;hadamard&#39;</span>
+    <span class="c1"># Neural Differential Eq</span>
+    <span class="n">nde_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;ode&#39;</span>
+    <span class="n">nde_depth</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">nde_hidden_dim</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">256</span>
+    <span class="n">nde_activation</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;elu&#39;</span>
+    <span class="n">nde_integration_method</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;euler&#39;</span>
+    <span class="n">nde_adjoint</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="c1"># device</span>
+    <span class="n">device</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s1">&#39;cpu&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="NLDF"><a class="viewcode-back" href="../../../torchnldm.model.html#torchnldm.model.nldm.NLDF">[docs]</a><span class="k">class</span> <span class="nc">NLDF</span><span class="p">(</span><span class="n">NLDMBase</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    NLDF class (Spatially-continuous NLDM).</span>
+<span class="sd">        </span>
+<span class="sd">    Args:</span>
+<span class="sd">        config (NLDFConfig): NLDF configuration class.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        n (int): dimension u(x,t;mu) codomain.</span>
+<span class="sd">        d (int): dimension of spatial domain (x).</span>
+<span class="sd">        Np (int): total number of parameters + time (Nmu + 1)</span>
+<span class="sd">        latent_dim (int): dimension of the latent state z(t).</span>
+<span class="sd">        nde_type (str): type of latent neural differential equation (ode/sde)</span>
+<span class="sd">        encoder (FieldEncoder): maps u0 --&gt; z0.</span>
+<span class="sd">        decoder (Decoder): maps zt --&gt; ut.</span>
+<span class="sd">        latent_nde (NeuralDE): evolves z0 ~~&gt; zt.</span>
+<span class="sd">        integration_method (std): numerical scheme used for the latent NDE time-integration.</span>
+<span class="sd">        adjoint (bool): flag for enabling the adjoint method (https://arxiv.org/abs/1806.07366) </span>
+<span class="sd">        device (torch.device): cpu/gpu(cuda)</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="nd">@multimethod</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">NLDFConfig</span><span class="p">):</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__parse_config</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+        
+        <span class="n">encoder</span> <span class="o">=</span> <span class="n">FieldEncoder</span><span class="p">(</span><span class="n">n</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">,</span>
+                               <span class="n">Np</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Np</span><span class="p">,</span>
+                               <span class="n">d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">d</span><span class="p">,</span>
+                               <span class="n">latent_dim</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">latent_dim</span><span class="p">,</span>
+                               <span class="n">depth</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoder_depth</span><span class="p">,</span>
+                               <span class="n">hidden_dim</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoder_hidden_dim</span><span class="p">,</span>
+                               <span class="n">activation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ae_activation</span><span class="p">,</span>
+                               <span class="n">architecture</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoder_architecture</span><span class="p">)</span>
+        
+        <span class="n">decoder</span> <span class="o">=</span> <span class="n">FieldDecoder</span><span class="p">(</span><span class="n">n</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">,</span>
+                               <span class="n">d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">d</span><span class="p">,</span>
+                               <span class="n">latent_dim</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">latent_dim</span><span class="p">,</span>
+                               <span class="n">depth</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">decoder_depth</span><span class="p">,</span>
+                               <span class="n">hidden_dim</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">decoder_hidden_dim</span><span class="p">,</span>
+                               <span class="n">activation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ae_activation</span><span class="p">,</span>
+                               <span class="n">architecture</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">decoder_architecture</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">nde_type</span> <span class="o">==</span> <span class="s1">&#39;ode&#39;</span><span class="p">:</span>
+            <span class="n">latent_nde</span> <span class="o">=</span> <span class="n">NeuralODE</span><span class="p">(</span><span class="n">MLP</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">latent_dim</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">latent_dim</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nde_hidden_dim</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nde_depth</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nde_activation</span><span class="p">))</span> 
+        <span class="k">elif</span> <span class="n">config</span><span class="o">.</span><span class="n">nde_type</span> <span class="o">==</span> <span class="s1">&#39;sde&#39;</span><span class="p">:</span>
+            <span class="n">latent_nde</span> <span class="o">=</span> <span class="n">NeuralSDE</span><span class="p">(</span><span class="n">MLP</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">latent_dim</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">latent_dim</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nde_hidden_dim</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nde_depth</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nde_activation</span><span class="p">),</span>
+                                   <span class="n">MLP</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">latent_dim</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">latent_dim</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nde_hidden_dim</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nde_depth</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nde_activation</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;nde_type must be either &quot;ode&quot; or &quot;sde&quot;, got instead </span><span class="si">{</span><span class="n">config</span><span class="o">.</span><span class="n">nde_type</span><span class="si">}</span><span class="s1">.&#39;</span><span class="p">)</span> 
+        
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">encoder</span> <span class="o">=</span> <span class="n">encoder</span><span class="p">,</span> 
+                            <span class="n">decoder</span> <span class="o">=</span> <span class="n">decoder</span><span class="p">,</span> 
+                            <span class="n">latent_nde</span> <span class="o">=</span> <span class="n">latent_nde</span><span class="p">,</span> 
+                            <span class="n">nde_integration_method</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">nde_integration_method</span><span class="p">,</span> 
+                            <span class="n">nde_adjoint</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">nde_adjoint</span><span class="p">,</span> 
+                            <span class="n">device</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+        
+    <span class="nd">@multimethod</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">encoder</span><span class="p">:</span> <span class="n">FieldEncoder</span> <span class="ow">or</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">,</span>
+                 <span class="n">decoder</span><span class="p">:</span> <span class="n">FieldDecoder</span> <span class="ow">or</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">,</span>
+                 <span class="n">latent_nde</span><span class="p">:</span> <span class="n">NeuralODE</span> <span class="ow">or</span> <span class="n">NeuralSDE</span><span class="p">,</span>
+                 <span class="n">nde_integration_method</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;euler&#39;</span><span class="p">,</span>
+                 <span class="n">nde_adjoint</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+                 <span class="n">device</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s1">&#39;cpu&#39;</span><span class="p">)):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Overloaded constructor, meant for modular instantiation, by providing each submodule</span>
+<span class="sd">        separately, without relying on the config object.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="kc">None</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="n">encoder</span><span class="p">,</span> <span class="n">decoder</span><span class="p">,</span> <span class="n">latent_nde</span><span class="p">):</span>
+            <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">encoder</span> <span class="o">=</span> <span class="n">encoder</span><span class="p">,</span> 
+                             <span class="n">decoder</span> <span class="o">=</span> <span class="n">decoder</span><span class="p">,</span> 
+                             <span class="n">latent_nde</span> <span class="o">=</span> <span class="n">latent_nde</span><span class="p">,</span> 
+                             <span class="n">nde_integration_method</span> <span class="o">=</span> <span class="n">nde_integration_method</span><span class="p">,</span> 
+                             <span class="n">nde_adjoint</span> <span class="o">=</span> <span class="n">nde_adjoint</span><span class="p">,</span> 
+                             <span class="n">device</span> <span class="o">=</span> <span class="n">device</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span> 
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;encoder, decoder and latent_nde must be passed to instantiate a NLDF.&#39;</span><span class="p">)</span>
+    
+        
+    <span class="k">def</span> <span class="nf">__parse_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">NLDFConfig</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">n</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">d</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">d</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Np</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">Np</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">latent_dim</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">latent_dim</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">encoder_depth</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">encoder_depth</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">encoder_hidden_dim</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">encoder_hidden_dim</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">encoder_architecture</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">encoder_architecture</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">decoder_depth</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">decoder_depth</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">decoder_hidden_dim</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">decoder_hidden_dim</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">decoder_architecture</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">decoder_architecture</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ae_activation</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">ae_activation</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nde_depth</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">nde_depth</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nde_hidden_dim</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">nde_hidden_dim</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nde_activation</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">nde_activation</span>
+        
+<div class="viewcode-block" id="NLDF.preprocess"><a class="viewcode-back" href="../../../torchnldm.model.html#torchnldm.model.nldm.NLDF.preprocess">[docs]</a>    <span class="k">def</span> <span class="nf">preprocess</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u0</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">mut0</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">t</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Performs preprocessing via the models&#39; DataScaler, over the input features.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">u0</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scaler</span><span class="o">.</span><span class="n">scale_feature</span><span class="p">(</span><span class="n">u0</span><span class="p">,</span> <span class="s1">&#39;u&#39;</span><span class="p">)</span>
+        <span class="n">mut0</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scaler</span><span class="o">.</span><span class="n">scale_feature</span><span class="p">(</span><span class="n">mut0</span><span class="p">,</span> <span class="s1">&#39;mu&#39;</span><span class="p">)</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scaler</span><span class="o">.</span><span class="n">scale_feature</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="s1">&#39;t&#39;</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scaler</span><span class="o">.</span><span class="n">scale_feature</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="s1">&#39;x&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">u0</span><span class="p">,</span> <span class="n">mut0</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">t</span></div>
+
+<div class="viewcode-block" id="NLDF.postprocess"><a class="viewcode-back" href="../../../torchnldm.model.html#torchnldm.model.nldm.NLDF.postprocess">[docs]</a>    <span class="k">def</span> <span class="nf">postprocess</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ut</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Performs postprocessing via the models&#39; DataScaler, over the models&#39; output.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">scaler</span><span class="o">.</span><span class="n">scale_feature</span><span class="p">(</span><span class="n">ut</span><span class="p">,</span> <span class="s1">&#39;u&#39;</span><span class="p">,</span> <span class="n">inverse</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span></div>
+    
+<div class="viewcode-block" id="NLDF.forward"><a class="viewcode-back" href="../../../torchnldm.model.html#torchnldm.model.nldm.NLDF.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> 
+                <span class="n">u0</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> 
+                <span class="n">mut0</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+                <span class="n">x</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> 
+                <span class="n">t</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> 
+                <span class="n">return_latent</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> 
+                <span class="n">preprocess</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> 
+                <span class="n">postprocess</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span> <span class="ow">or</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Forward method defining the inference behavior of the NLDF.</span>
+
+<span class="sd">        Args: </span>
+<span class="sd">            :u0: (Tensor): discretized state initial value, of shape = (B,M,n).</span>
+<span class="sd">            :mut0: (Tensor): parameters tensor, concatenated with the initial timestep (as provided by PDEGen), of shape = (B,M,Np).</span>
+<span class="sd">            :x: (Tensor): nodes coordinates tensor of shape = (B,M,d).</span>
+<span class="sd">            :t: (Tensor): 1d tensor of timesteps to perform latent integration, of shape (T,).</span>
+<span class="sd">            :return_latent: (bool): flag to return the latent dynamics z(t), evalued at the timesteps t.</span>
+<span class="sd">            :preprocess: (bool): flag to perform input features scaling.</span>
+<span class="sd">            :postprocess: (bool): flag to perform output scaling.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            :ut: (Tensor): evolution of the high-dimensional state, of shape shape = (T,B,Nh).</span>
+<span class="sd">            :zt: (Tensor): evolution of the latent state,  of shape shape = (T,B,latent_dim).</span>
+
+<span class="sd">        Shapes:</span>
+<span class="sd">            - B: batch size (params)</span>
+<span class="sd">            - M: batch size (nodes coordinates)</span>
+<span class="sd">            - n: dim of u&#39;s codomain</span>
+<span class="sd">            - d: dim of u&#39;s spatial-domain</span>
+<span class="sd">            - T: number of timesteps involved in the prediction (length of the prediction window)</span>
+<span class="sd">            - latent_dim: dimension of the latent state vector</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="n">preprocess</span><span class="p">:</span>
+            <span class="n">u0</span><span class="p">,</span> <span class="n">mut0</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">t</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">preprocess</span><span class="p">(</span><span class="n">u0</span><span class="p">,</span> <span class="n">mut0</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">dim</span><span class="p">()</span><span class="o">==</span><span class="mi">3</span><span class="p">:</span>
+            <span class="c1">#[B,M,d] -&gt; [T,B,M,d]</span>
+            <span class="n">xt</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">expand</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">x</span><span class="o">.</span><span class="n">dim</span><span class="p">()</span><span class="o">==</span><span class="mi">2</span><span class="p">:</span>
+            <span class="c1">#[M,d] -&gt; [T,M,d]</span>
+            <span class="n">xt</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">expand</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        
+        <span class="n">z0</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span><span class="p">(</span><span class="n">u0</span><span class="p">,</span> <span class="n">mut0</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+        <span class="n">zt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">latent_nde</span><span class="p">(</span><span class="n">z0</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nde_integration_method</span><span class="p">)</span>
+        <span class="n">ut</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">decoder</span><span class="p">(</span><span class="n">zt</span><span class="p">,</span> <span class="n">xt</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">postprocess</span><span class="p">:</span>
+            <span class="n">ut</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">postprocess</span><span class="p">(</span><span class="n">ut</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">(</span><span class="n">ut</span><span class="p">,</span> <span class="n">zt</span><span class="p">)</span> <span class="k">if</span> <span class="n">return_latent</span> <span class="k">else</span> <span class="n">ut</span></div>
+        
+<div class="viewcode-block" id="NLDF.loss_criterion"><a class="viewcode-back" href="../../../torchnldm.model.html#torchnldm.model.nldm.NLDF.loss_criterion">[docs]</a>    <span class="k">def</span> <span class="nf">loss_criterion</span><span class="p">(</span><span class="bp">self</span> <span class="p">,</span><span class="n">ut</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">ut_pred</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span><span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">loss_criterion</span><span class="p">(</span><span class="n">ut</span><span class="p">,</span> <span class="n">ut_pred</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="NLDF.loss"><a class="viewcode-back" href="../../../torchnldm.model.html#torchnldm.model.nldm.NLDF.loss">[docs]</a>    <span class="k">def</span> <span class="nf">loss</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> 
+             <span class="n">u0</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> 
+             <span class="n">mut0</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+             <span class="n">x</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> 
+             <span class="n">t</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> 
+             <span class="n">ut</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> 
+             <span class="n">mut</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+        
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">latent_guidance</span><span class="p">:</span>
+            <span class="n">xt</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">expand</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">zt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span><span class="p">(</span><span class="n">ut</span><span class="p">,</span> <span class="n">mut</span><span class="p">,</span> <span class="n">xt</span><span class="p">)</span>
+            <span class="n">ut_pred</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">decoder</span><span class="p">(</span><span class="n">zt</span><span class="p">,</span> <span class="n">xt</span><span class="p">)</span>
+            <span class="n">loss</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">loss_criterion</span><span class="p">(</span><span class="n">ut</span><span class="p">,</span> <span class="n">ut_pred</span><span class="p">)</span> <span class="c1"># u0,...,uT autoencoding loss term</span>
+            <span class="n">zt_pred</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">latent_nde</span><span class="p">(</span><span class="n">zt</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="o">...</span><span class="p">],</span> <span class="n">t</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nde_integration_method</span><span class="p">)</span> 
+            <span class="n">loss</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">loss_criterion</span><span class="p">(</span><span class="n">zt</span><span class="p">,</span> <span class="n">zt_pred</span><span class="p">)</span> <span class="c1"># latent guiding loss term</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">bidirectional</span><span class="p">:</span>
+                <span class="n">t_backward</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">flip</span><span class="p">(</span><span class="n">t</span><span class="p">,[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="n">zt_backward</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">flip</span><span class="p">(</span><span class="n">zt</span><span class="p">,[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="n">zt_backward_pred</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">latent_nde</span><span class="p">(</span><span class="n">zt</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="o">...</span><span class="p">],</span> <span class="n">t_backward</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nde_integration_method</span><span class="p">)</span> 
+                <span class="n">loss</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">loss_criterion</span><span class="p">(</span><span class="n">zt_backward</span><span class="p">,</span> <span class="n">zt_backward_pred</span><span class="p">)</span> <span class="c1"># latent backward dynamics loss term</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ut_pred</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">u0</span><span class="p">,</span> <span class="n">mut0</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
+            <span class="n">loss</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">loss_criterion</span><span class="p">(</span><span class="n">ut</span><span class="p">,</span> <span class="n">ut_pred</span><span class="p">)</span>                                 <span class="c1"># observable dynamics loss term</span>
+            <span class="n">loss</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">loss_criterion</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">decoder</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">encoder</span><span class="p">(</span><span class="n">u0</span><span class="p">,</span><span class="n">mut0</span><span class="p">,</span><span class="n">x</span><span class="p">),</span><span class="n">x</span><span class="p">),</span><span class="n">u0</span><span class="p">)</span> <span class="c1"># u0 autoencoding loss term</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">bidirectional</span><span class="p">:</span>
+                <span class="n">t_backward</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">flip</span><span class="p">(</span><span class="n">t</span><span class="p">,[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="n">ut_backward</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">flip</span><span class="p">(</span><span class="n">ut_pred</span><span class="p">,[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="n">ut_backward_pred</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">ut_backward</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="o">...</span><span class="p">],</span> <span class="n">x</span><span class="p">,</span> <span class="n">mut</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="o">...</span><span class="p">],</span> <span class="n">t_backward</span><span class="p">)</span>
+                <span class="n">loss</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">loss_criterion</span><span class="p">(</span><span class="n">ut_backward</span><span class="p">,</span> <span class="n">ut_backward_pred</span><span class="p">)</span>  <span class="c1"># observable backward dynamics loss term</span>
+        <span class="k">return</span> <span class="n">loss</span></div>
+
+<div class="viewcode-block" id="NLDF.get_batch_loss"><a class="viewcode-back" href="../../../torchnldm.model.html#torchnldm.model.nldm.NLDF.get_batch_loss">[docs]</a>    <span class="k">def</span> <span class="nf">get_batch_loss</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                       <span class="n">dataset</span><span class="p">:</span> <span class="n">DataLoader</span><span class="p">,</span> 
+                       <span class="n">section_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> 
+                       <span class="n">t0_index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> 
+                       <span class="n">batch_sizes</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+        
+        <span class="n">batch_size_params</span><span class="p">,</span> <span class="n">batch_size_timesteps</span><span class="p">,</span> <span class="n">batch_size_nodes</span> <span class="o">=</span> <span class="n">batch_sizes</span>
+        <span class="n">u0</span><span class="p">,</span> <span class="n">mut0</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">ut</span><span class="p">,</span> <span class="n">mut</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">get_batch</span><span class="p">(</span><span class="n">section_id</span><span class="p">,</span> <span class="n">t0_index</span><span class="p">,</span> <span class="n">batch_size_params</span><span class="p">,</span> <span class="n">batch_size_timesteps</span><span class="p">,</span> <span class="n">batch_size_nodes</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">loss</span><span class="p">(</span><span class="n">u0</span><span class="p">,</span> <span class="n">mut0</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">ut</span><span class="p">,</span> <span class="n">mut</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="NLDF.predict_trajectory"><a class="viewcode-back" href="../../../torchnldm.model.html#torchnldm.model.nldm.NLDF.predict_trajectory">[docs]</a>    <span class="nd">@torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">()</span>
+    <span class="k">def</span> <span class="nf">predict_trajectory</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> 
+            <span class="n">dataset</span><span class="p">:</span> <span class="n">DataLoader</span><span class="p">,</span> 
+            <span class="n">t0_index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+            <span class="n">param_index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>   
+            <span class="n">timesteps</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+            <span class="n">enable_scaling</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+            <span class="n">return_inputs</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">]:</span>
+        
+        <span class="n">u0</span><span class="p">,</span> <span class="n">mut0</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">ut</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">get_trajectory</span><span class="p">(</span><span class="s1">&#39;complete&#39;</span><span class="p">,</span> <span class="n">t0_index</span><span class="p">,</span> <span class="n">param_index</span><span class="p">,</span> <span class="n">timesteps</span><span class="p">,</span> <span class="n">field_form</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="n">ut_pred</span><span class="p">,</span> <span class="n">pred_t</span> <span class="o">=</span> <span class="n">timing</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">forward</span><span class="p">)(</span><span class="n">u0</span><span class="p">,</span> <span class="n">mut0</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">preprocess</span> <span class="o">=</span> <span class="n">enable_scaling</span><span class="p">,</span> <span class="n">postprocess</span> <span class="o">=</span> <span class="n">enable_scaling</span><span class="p">)</span>
+        <span class="n">ut</span><span class="p">,</span> <span class="n">ut_pred</span> <span class="o">=</span> <span class="n">ut</span><span class="o">.</span><span class="n">flatten</span><span class="p">(</span><span class="n">start_dim</span><span class="o">=-</span><span class="mi">2</span><span class="p">),</span> <span class="n">ut_pred</span><span class="o">.</span><span class="n">flatten</span><span class="p">(</span><span class="n">start_dim</span><span class="o">=-</span><span class="mi">2</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">ut</span><span class="p">,</span> <span class="n">ut_pred</span><span class="p">,</span> <span class="n">pred_t</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">mut0</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span> <span class="k">if</span> <span class="n">return_inputs</span> <span class="k">else</span> <span class="p">(</span><span class="n">ut</span><span class="p">,</span> <span class="n">ut_pred</span><span class="p">,</span> <span class="n">pred_t</span><span class="p">)</span></div></div>
+       
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Nicola Farenga.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

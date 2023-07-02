@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>torchnldm.model.ae &mdash; TorchNLDM 0.1 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            TorchNLDM
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../torchnldm.data.html">torchnldm.data package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../torchnldm.model.html">torchnldm.model package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../torchnldm.train.html">torchnldm.train package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../torchnldm.evaluate.html">torchnldm.evaluate package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../torchnldm.utils.html">torchnldm.utils package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">TorchNLDM</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">torchnldm.model.ae</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for torchnldm.model.ae</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">nn</span>
+
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+
+<span class="kn">from</span> <span class="nn">..utils.nn</span> <span class="kn">import</span> <span class="n">MLP</span><span class="p">,</span> <span class="n">Downsample</span><span class="p">,</span> <span class="n">Upsample</span><span class="p">,</span> <span class="n">ConvLayer</span><span class="p">,</span> <span class="n">ConvResBlock</span><span class="p">,</span> <span class="n">HiddenOpNet</span><span class="p">,</span> <span class="n">_hidden_op_layers</span>
+<span class="kn">from</span> <span class="nn">..utils.ops</span> <span class="kn">import</span> <span class="n">multiple_unsqueeze</span>
+<span class="kn">from</span> <span class="nn">..utils.addtypes</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">Autoencoder Modules</span>
+<span class="sd">&#39;&#39;&#39;</span>
+
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">Encoder</span>
+<span class="sd">&#39;&#39;&#39;</span>
+
+<div class="viewcode-block" id="StateEncoder"><a class="viewcode-back" href="../../../torchnldm.model.html#torchnldm.model.ae.StateEncoder">[docs]</a><span class="k">class</span> <span class="nc">StateEncoder</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    State encoder for producing an embedding of the spatially-discretized state uh(t).</span>
+<span class="sd">    Consists of a feed-forward convolutional architecture, possibly equipped with residual connections.</span>
+<span class="sd">    For the parameterized version consider using the PStateEncoder class.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        :Nh: (int), number of degrees of freedom of the spatially discretized state uh(t).</span>
+<span class="sd">        :Np: (int), number of parameters (Nmu) + 1.</span>
+<span class="sd">        :latent_dim: (int), dimension of the latent state z(t).</span>
+<span class="sd">        :conv_dim: (int), dimensionality of the emlpoyed convolutions (1d,2d).</span>
+<span class="sd">        :conv_depth: (int), number of convolutional layers (or blocks) in the state decoder.</span>
+<span class="sd">        :in_channels: (int), number of channels of the input state.</span>
+<span class="sd">        :hidden_channels: (int), number of output channels produced by the first convolutional layer (or block).</span>
+<span class="sd">        :reshape_dim: (int), to be specified when applying Conv2d to 1d vectors of size `Nh`, so reshape_dim must be `int(sqrt(Nh))`.</span>
+<span class="sd">        :residual_blocks: (bool), if True blocks with two convolutional layers equipped with skip connections are used, instead of single convolutional layers.</span>
+<span class="sd">        :mlp_state_hidden_dim: (int), dimensionality of the state-embedding MLP hidden layers.</span>
+<span class="sd">        :param_emb: (str), method to combine state and parameters embeddings (&#39;multiply&#39;, &#39;project&#39;, &#39;sum&#39;).</span>
+<span class="sd">        :mlp_param_depth: (int), number of hidden layers of the parameters-embedding MLP.</span>
+<span class="sd">        :mlp_param_hidden_dim: (int), dimensionality of the parameters-embedding MLP hidden layers.</span>
+<span class="sd">        :mlp_time_depth: (int), number of hidden layers of the time-embedding MLP.</span>
+<span class="sd">        :mlp_time_hidden_dim: (int), dimensionality of the time-embedding MLP hidden layers.</span>
+<span class="sd">        :activation: (str), activation of the state and parameter encoders.</span>
+<span class="sd">    </span>
+<span class="sd">    Architecture:</span>
+
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">Nh</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+                 <span class="n">Np</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+                 <span class="n">latent_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+                 <span class="n">conv_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+                 <span class="n">conv_depth</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+                 <span class="n">in_channels</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+                 <span class="n">hidden_channels</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+                 <span class="n">reshape_dim</span><span class="p">:</span> <span class="nb">int</span> <span class="ow">or</span> <span class="nb">tuple</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">residual_blocks</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+                 <span class="n">mlp_state_hidden_dim</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">256</span><span class="p">,</span>
+                 <span class="n">param_emb</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;multiply&#39;</span><span class="p">,</span>
+                 <span class="n">mlp_param_depth</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span>
+                 <span class="n">mlp_param_hidden_dim</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">256</span><span class="p">,</span>
+                 <span class="n">mlp_time_depth</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span>
+                 <span class="n">mlp_time_hidden_dim</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">256</span><span class="p">,</span>
+                 <span class="n">activation</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;elu&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">Nh</span> <span class="o">=</span> <span class="n">Nh</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Np</span> <span class="o">=</span> <span class="n">Np</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">latent_dim</span> <span class="o">=</span> <span class="n">latent_dim</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">conv_dim</span> <span class="o">=</span> <span class="n">conv_dim</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">conv_depth</span> <span class="o">=</span> <span class="n">conv_depth</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">in_channels</span> <span class="o">=</span> <span class="n">in_channels</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hidden_channels</span> <span class="o">=</span> <span class="n">hidden_channels</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reshape_dim</span> <span class="o">=</span> <span class="n">reshape_dim</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">residual_blocks</span> <span class="o">=</span> <span class="n">residual_blocks</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mlp_state_hidden_dim</span> <span class="o">=</span> <span class="n">mlp_state_hidden_dim</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">param_emb</span> <span class="o">=</span> <span class="n">param_emb</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mlp_param_depth</span> <span class="o">=</span> <span class="n">mlp_param_depth</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mlp_param_hidden_dim</span> <span class="o">=</span> <span class="n">mlp_param_hidden_dim</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mlp_time_depth</span> <span class="o">=</span> <span class="n">mlp_time_depth</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mlp_time_hidden_dim</span> <span class="o">=</span> <span class="n">mlp_time_hidden_dim</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">activation</span> <span class="o">=</span> <span class="n">activation</span>
+
+        <span class="c1"># Assert convolutions type</span>
+        <span class="k">assert</span> <span class="n">conv_dim</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">),</span> <span class="sa">f</span><span class="s1">&#39;conv_dim must be either 1 or 2, got instead </span><span class="si">{</span><span class="n">conv_dim</span><span class="si">}</span><span class="s1">.&#39;</span>
+        
+        <span class="k">if</span> <span class="n">conv_dim</span><span class="o">==</span><span class="mi">2</span> <span class="ow">and</span> <span class="n">reshape_dim</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">reshape_dim</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">Nh</span><span class="p">))</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Reshape dimension not specified, using reshape_dim = sqrt(Nh).&#39;</span><span class="p">)</span>
+        
+        <span class="c1"># Embedding Method </span>
+        <span class="c1"># multiply: element-wise product between the state and parameters embeddings</span>
+        <span class="c1"># sum: element-wise sum between the state and parameters embeddings</span>
+        <span class="c1"># project: computes the projection of the state embedding along the parameters embedding vector</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__param_emb_methods</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;multiply&#39;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">a</span><span class="p">,</span><span class="n">b</span> <span class="p">:</span> <span class="n">a</span><span class="o">*</span><span class="n">b</span><span class="p">,</span>
+                                    <span class="s1">&#39;sum&#39;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">a</span><span class="p">,</span><span class="n">b</span> <span class="p">:</span> <span class="n">a</span><span class="o">+</span><span class="n">b</span><span class="p">,</span>
+                                    <span class="s1">&#39;project&#39;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">a</span><span class="p">,</span><span class="n">b</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__inner</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">)</span><span class="o">*</span><span class="n">b</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">__inner</span><span class="p">(</span><span class="n">b</span><span class="p">,</span><span class="n">b</span><span class="p">)}</span>
+        <span class="k">assert</span> <span class="n">param_emb</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__param_emb_methods</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span> <span class="sa">f</span><span class="s1">&#39;Available parameters embedding methods are </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">__param_emb_methods</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span><span class="si">}</span><span class="s1">, got instead </span><span class="si">{</span><span class="n">param_emb</span><span class="si">}</span><span class="s1">.&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__emb_method</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__param_emb_methods</span><span class="p">[</span><span class="n">param_emb</span><span class="p">]</span>
+
+        <span class="c1"># Construction of the convolutional net to produce intermediate state embedding</span>
+        <span class="n">conv_layer</span> <span class="o">=</span> <span class="n">ConvResBlock</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">residual_blocks</span> <span class="k">else</span> <span class="n">ConvLayer</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">input_block</span> <span class="o">=</span> <span class="n">Downsample</span><span class="p">(</span><span class="n">conv_layer</span><span class="p">(</span><span class="n">in_channels</span><span class="p">,</span> <span class="n">hidden_channels</span><span class="p">,</span> <span class="n">conv_dim</span><span class="p">,</span> <span class="n">activation</span> <span class="o">=</span> <span class="n">activation</span><span class="p">),</span> <span class="n">conv_dim</span><span class="p">)</span>
+
+        <span class="n">middle_layers</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">out_ch</span> <span class="o">=</span> <span class="n">hidden_channels</span>
+        <span class="k">assert</span> <span class="n">conv_depth</span><span class="o">&gt;=</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;At least 1 hidden layer is required, consisting of a network with 1 input and 1 output layers.&#39;</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">conv_depth</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+            <span class="n">in_ch</span> <span class="o">=</span> <span class="n">hidden_channels</span><span class="o">*</span><span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="n">i</span><span class="p">)</span>
+            <span class="n">out_ch</span> <span class="o">=</span> <span class="n">hidden_channels</span><span class="o">*</span><span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
+            <span class="n">middle_layers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Downsample</span><span class="p">(</span><span class="n">conv_layer</span><span class="p">(</span><span class="n">in_ch</span><span class="p">,</span> <span class="n">out_ch</span><span class="p">,</span> <span class="n">conv_dim</span><span class="p">,</span> <span class="n">activation</span> <span class="o">=</span> <span class="n">activation</span><span class="p">),</span> <span class="n">conv_dim</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">middle_block</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span><span class="o">*</span><span class="n">middle_layers</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">output_block</span> <span class="o">=</span> <span class="n">ConvLayer</span><span class="p">(</span><span class="n">out_ch</span><span class="p">,</span> <span class="n">out_ch</span><span class="p">,</span> <span class="n">conv_dim</span><span class="p">,</span> <span class="n">last</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+
+        <span class="c1"># MLPs instantiation</span>
+        <span class="n">mlp_in_dim</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__forward_conv</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">Nh</span><span class="p">))</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mlp_state</span> <span class="o">=</span> <span class="n">MLP</span><span class="p">(</span><span class="n">mlp_in_dim</span><span class="p">,</span> <span class="n">latent_dim</span><span class="p">,</span> <span class="n">mlp_state_hidden_dim</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">activation</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mlp_param</span> <span class="o">=</span> <span class="n">MLP</span><span class="p">(</span><span class="n">Np</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">latent_dim</span><span class="p">,</span> <span class="n">mlp_param_hidden_dim</span><span class="p">,</span> <span class="n">mlp_param_depth</span><span class="p">,</span> <span class="n">activation</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mlp_time</span> <span class="o">=</span> <span class="n">MLP</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">latent_dim</span><span class="p">,</span> <span class="n">mlp_time_hidden_dim</span><span class="p">,</span> <span class="n">mlp_time_depth</span><span class="p">,</span> <span class="n">activation</span><span class="p">)</span>
+        
+    <span class="k">def</span> <span class="nf">__in_reshape</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Performs input reshaping, depending on the type of convolutions employed.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">conv_dim</span><span class="o">==</span><span class="mi">2</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">reshape_dim</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">u</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">in_channels</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">reshape_dim</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">reshape_dim</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">reshape_dim</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">u</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">in_channels</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">reshape_dim</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">reshape_dim</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">conv_dim</span><span class="o">==</span><span class="mi">1</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">reshape_dim</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">u</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">in_channels</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">reshape_dim</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">conv_dim</span><span class="o">==</span><span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">u</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Nh</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__out_reshape</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">h</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">u</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Performs state embedding reshape method, output of the convolutional trunk.</span>
+<span class="sd">        Depends on the input state shape.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="n">u</span><span class="o">.</span><span class="n">dim</span><span class="p">()</span><span class="o">==</span><span class="mi">3</span><span class="p">:</span>
+            <span class="c1"># Input u of shape [T,B,Nh]</span>
+            <span class="n">T</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">_</span><span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">shape</span>
+            <span class="n">out_shape</span> <span class="o">=</span> <span class="p">[</span><span class="n">T</span><span class="p">,</span><span class="n">B</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="n">u</span><span class="o">.</span><span class="n">dim</span><span class="p">()</span><span class="o">==</span><span class="mi">2</span><span class="p">:</span>
+            <span class="c1"># Input u of shape [B,Nh]</span>
+            <span class="n">B</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">shape</span>
+            <span class="n">out_shape</span> <span class="o">=</span> <span class="p">[</span><span class="n">B</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="n">u</span><span class="o">.</span><span class="n">dim</span><span class="p">()</span><span class="o">==</span><span class="mi">1</span><span class="p">:</span>
+            <span class="c1"># Input u of shape [Nh]</span>
+            <span class="n">out_shape</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        
+        <span class="k">return</span> <span class="n">h</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">out_shape</span><span class="p">)</span>
+    
+    <span class="k">def</span> <span class="nf">__inner</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Computing inner product between tensors.</span>
+<span class="sd">        Depending on the batching (T,B) and architecture (dense, fully conv), we</span>
+<span class="sd">        have to deal with differently shaped tensor, which are handled by this method,</span>
+<span class="sd">        to compute the inner (dot) product.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">assert</span> <span class="n">a</span><span class="o">.</span><span class="n">dim</span><span class="p">()</span><span class="o">==</span><span class="n">b</span><span class="o">.</span><span class="n">dim</span><span class="p">(),</span> <span class="sa">f</span><span class="s2">&quot;Dimensions must coincide when computing tensor inner product, got a (</span><span class="si">{</span><span class="n">a</span><span class="o">.</span><span class="n">dim</span><span class="p">()</span><span class="si">}</span><span class="s2">) and b (</span><span class="si">{</span><span class="n">b</span><span class="o">.</span><span class="n">dim</span><span class="p">()</span><span class="si">}</span><span class="s2">).&quot;</span>
+        <span class="k">if</span> <span class="n">a</span><span class="o">.</span><span class="n">dim</span><span class="p">()</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="c1">#[B,latent_dim]</span>
+            <span class="n">inner</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">einsum</span><span class="p">(</span><span class="s1">&#39;ij,ij-&gt;i&#39;</span><span class="p">,</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">a</span><span class="o">.</span><span class="n">dim</span><span class="p">()</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="c1">#[T,B,latent_dim]</span>
+            <span class="n">inner</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">einsum</span><span class="p">(</span><span class="s1">&#39;ijk,ijk-&gt;ij&#39;</span><span class="p">,</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">multiple_unsqueeze</span><span class="p">(</span><span class="n">inner</span><span class="p">,</span> <span class="n">a</span><span class="o">.</span><span class="n">dim</span><span class="p">()</span><span class="o">-</span><span class="n">inner</span><span class="o">.</span><span class="n">dim</span><span class="p">())</span> 
+    
+    <span class="k">def</span> <span class="nf">__forward_conv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Defines the forward data flow for the convolutional trunk, to produce the the state embedding.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">h</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__in_reshape</span><span class="p">(</span><span class="n">u</span><span class="p">)</span>    
+        <span class="n">h</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_block</span><span class="p">(</span><span class="n">h</span><span class="p">)</span>
+        <span class="n">h</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">middle_block</span><span class="p">(</span><span class="n">h</span><span class="p">)</span>
+        <span class="n">h</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_block</span><span class="p">(</span><span class="n">h</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__out_reshape</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">u</span><span class="p">)</span>
+        
+<div class="viewcode-block" id="StateEncoder.forward"><a class="viewcode-back" href="../../../torchnldm.model.html#torchnldm.model.ae.StateEncoder.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">mut</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Forward method defining the inference scheme of the state encoder module.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="n">mut</span><span class="o">.</span><span class="n">dim</span><span class="p">()</span><span class="o">==</span><span class="mi">1</span><span class="p">:</span>
+            <span class="n">mut</span> <span class="o">=</span> <span class="n">mut</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="c1"># Compute state embedding</span>
+        <span class="n">u_emb</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__forward_conv</span><span class="p">(</span><span class="n">u</span><span class="p">)</span>        
+        <span class="n">u_emb</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mlp_state</span><span class="p">(</span><span class="n">u_emb</span><span class="p">)</span>
+        <span class="c1"># Compute parameters embedding</span>
+        <span class="n">mu_emb</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mlp_param</span><span class="p">(</span><span class="n">mut</span><span class="p">[</span><span class="o">...</span><span class="p">,:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="c1"># Compute time embedding</span>
+        <span class="n">t0_emb</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mlp_time</span><span class="p">(</span><span class="n">mut</span><span class="p">[</span><span class="o">...</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">:])</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__emb_method</span><span class="p">(</span><span class="n">u_emb</span><span class="p">,</span> <span class="n">mu_emb</span><span class="p">)</span> <span class="o">+</span> <span class="n">t0_emb</span> <span class="c1"># Combine embeddings</span></div></div>
+
+
+<div class="viewcode-block" id="FieldEncoder"><a class="viewcode-back" href="../../../torchnldm.model.html#torchnldm.model.ae.FieldEncoder">[docs]</a><span class="k">class</span> <span class="nc">FieldEncoder</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Field Encoder class.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        :n: (int), dimension of the continuos state u(x,t;mu).</span>
+<span class="sd">        :Np: (int), dimension of the parameters vector (mu,t), dim=(Nmu + 1).</span>
+<span class="sd">        :d: (int), dimension of the spatial domain (n coordinates).</span>
+<span class="sd">        :latent_dim: (int), dimension of the output latent encoding.</span>
+<span class="sd">        :depth: (int), number of layers of the MLPs.</span>
+<span class="sd">        :hidden_dim: (int), MLPs&#39; hidden layers size.</span>
+<span class="sd">        :activation: (str), activation of the state and parameter encoders.</span>
+<span class="sd">        :architecture: (str), defines the network architecture</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+                 <span class="n">Np</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+                 <span class="n">d</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> 
+                 <span class="n">latent_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+                 <span class="n">depth</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
+                 <span class="n">hidden_dim</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">64</span><span class="p">,</span>
+                 <span class="n">activation</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;elu&#39;</span><span class="p">,</span>
+                 <span class="n">architecture</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;hidden_sum&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n</span> <span class="o">=</span> <span class="n">n</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Np</span> <span class="o">=</span> <span class="n">Np</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">d</span> <span class="o">=</span> <span class="n">d</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">latent_dim</span> <span class="o">=</span> <span class="n">latent_dim</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">depth</span> <span class="o">=</span> <span class="n">depth</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hidden_dim</span> <span class="o">=</span> <span class="n">hidden_dim</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">activation</span> <span class="o">=</span> <span class="n">activation</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">architecture</span> <span class="o">=</span> <span class="n">architecture</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">architecture</span> <span class="ow">in</span> <span class="n">_hidden_op_layers</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">net</span> <span class="o">=</span> <span class="n">HiddenOpNet</span><span class="p">(</span><span class="n">input_dim</span> <span class="o">=</span> <span class="n">n</span><span class="o">+</span><span class="n">Np</span><span class="p">,</span>
+                                   <span class="n">cond_input_dim</span> <span class="o">=</span> <span class="n">d</span><span class="p">,</span>
+                                   <span class="n">output_dim</span> <span class="o">=</span> <span class="n">latent_dim</span><span class="p">,</span>
+                                   <span class="n">hidden_dim</span> <span class="o">=</span> <span class="n">hidden_dim</span><span class="p">,</span> 
+                                   <span class="n">depth</span> <span class="o">=</span> <span class="n">depth</span><span class="p">,</span>
+                                   <span class="n">activation</span> <span class="o">=</span> <span class="n">activation</span><span class="p">,</span>
+                                   <span class="n">positional_encoding</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+                                   <span class="n">architecture</span> <span class="o">=</span> <span class="n">architecture</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">architecture</span> <span class="o">==</span> <span class="s1">&#39;mlp&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">net</span> <span class="o">=</span> <span class="n">MLP</span><span class="p">(</span><span class="n">n</span><span class="o">+</span><span class="n">Np</span><span class="o">+</span><span class="n">d</span><span class="p">,</span> <span class="n">latent_dim</span><span class="p">,</span> <span class="n">hidden_dim</span><span class="p">,</span> <span class="n">depth</span><span class="p">,</span> <span class="n">activation</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Available networks types are: </span><span class="si">{</span><span class="n">_hidden_op_layers</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span><span class="si">}</span><span class="s1"> and &quot;mlp&quot;, got instead </span><span class="si">{</span><span class="n">architecture</span><span class="si">}</span><span class="s1">.&#39;</span><span class="p">)</span>
+    
+<div class="viewcode-block" id="FieldEncoder.forward"><a class="viewcode-back" href="../../../torchnldm.model.html#torchnldm.model.ae.FieldEncoder.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">mut</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">architecture</span> <span class="ow">in</span> <span class="n">_hidden_op_layers</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">net</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">u</span><span class="p">,</span><span class="n">mut</span><span class="p">],</span><span class="o">-</span><span class="mi">1</span><span class="p">),</span> <span class="n">x</span><span class="p">)</span> 
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">net</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">u</span><span class="p">,</span><span class="n">mut</span><span class="p">,</span><span class="n">x</span><span class="p">],</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span> </div></div>
+
+
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">Decoder</span>
+<span class="sd">&#39;&#39;&#39;</span>
+
+<div class="viewcode-block" id="StateDecoder"><a class="viewcode-back" href="../../../torchnldm.model.html#torchnldm.model.ae.StateDecoder">[docs]</a><span class="k">class</span> <span class="nc">StateDecoder</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    State decoder for decoding a sequence of latent encodings z(t0;mu),...,z(tf;mu) into the high dimensional</span>
+<span class="sd">    spatially-discretized states uh(t0;mu),...,uh(tf;mu).</span>
+<span class="sd">    Consists of an input MLP, producing an intermediate representation, which is then reshaped and processed </span>
+<span class="sd">    by a feed-forward convolutional architecture, possibly equipped with residual connections.</span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">        :Nh: (int), dimension of the output spatially discretized state uh(t;mu).</span>
+<span class="sd">        :latent_dim: (int), dimension of the input latent encodings z(t;mu).</span>
+<span class="sd">        :conv_dim: (int), dimensionality of the emlpoyed convolutions (1d,2d).</span>
+<span class="sd">        :conv_depth: (int), number of convolutional layers (or blocks) in the state decoder.</span>
+<span class="sd">        :out_channels: (int), number of output channels of the decoded state.</span>
+<span class="sd">        :hidden_channels: (int), number of channels produced by the first convolutional layer (or block).</span>
+<span class="sd">        :reshape_dim: (int), intermediate reshape dimension to pass from the MLP representation to the convolutional one.</span>
+<span class="sd">        :residual_blocks: (bool), if True blocks with two convolutional layers equipped with skip connections are used, instead of single convolutional layers.</span>
+<span class="sd">        :mlp_hidden_dim: (int), dimensionality of the MLP hidden layers.</span>
+<span class="sd">        :activation: (str), activation of the input MLP and the convolutional network.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">Nh</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+                 <span class="n">latent_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+                 <span class="n">conv_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+                 <span class="n">conv_depth</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+                 <span class="n">out_channels</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+                 <span class="n">hidden_channels</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+                 <span class="n">reshape_dim</span><span class="p">:</span> <span class="nb">int</span> <span class="ow">or</span> <span class="nb">tuple</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">residual_blocks</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+                 <span class="n">mlp_hidden_dim</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">activation</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;elu&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        
+        <span class="c1"># Assert convolutions type</span>
+        <span class="k">assert</span> <span class="n">conv_dim</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">),</span> <span class="sa">f</span><span class="s1">&#39;conv_dim must be either 1 or 2, got instead </span><span class="si">{</span><span class="n">conv_dim</span><span class="si">}</span><span class="s1">.&#39;</span>
+        
+        <span class="k">if</span> <span class="n">reshape_dim</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">conv_dim</span><span class="o">==</span><span class="mi">2</span><span class="p">:</span>
+                <span class="n">reshape_dim</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">latent_dim</span><span class="p">))</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Reshape dimension not specified, using reshape_dim = sqrt(latent_dim).&#39;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">reshape_dim</span> <span class="o">=</span> <span class="n">latent_dim</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">Nh</span> <span class="o">=</span> <span class="n">Nh</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">latent_dim</span> <span class="o">=</span> <span class="n">latent_dim</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">conv_dim</span> <span class="o">=</span> <span class="n">conv_dim</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">out_channels</span> <span class="o">=</span> <span class="n">out_channels</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hidden_channels</span> <span class="o">=</span> <span class="n">hidden_channels</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">conv_depth</span> <span class="o">=</span> <span class="n">conv_depth</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reshape_dim</span> <span class="o">=</span> <span class="n">reshape_dim</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mlp_hidden_dim</span> <span class="o">=</span> <span class="n">mlp_hidden_dim</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">activation</span> <span class="o">=</span> <span class="n">activation</span>
+
+        <span class="c1"># Output shape check</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">reshape_dim</span><span class="p">,</span><span class="nb">int</span><span class="p">):</span>
+            <span class="n">out_shape</span> <span class="o">=</span> <span class="n">out_channels</span><span class="o">*</span><span class="p">(</span><span class="n">reshape_dim</span><span class="o">*</span><span class="mi">2</span><span class="o">**</span><span class="n">conv_depth</span><span class="p">)</span><span class="o">**</span><span class="n">conv_dim</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">reshape_dim</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+            <span class="n">out_shape</span> <span class="o">=</span> <span class="n">out_channels</span><span class="o">*</span><span class="p">(</span><span class="n">reshape_dim</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="mi">2</span><span class="o">**</span><span class="n">conv_depth</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">reshape_dim</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="mi">2</span><span class="o">**</span><span class="n">conv_depth</span><span class="p">)</span>
+        <span class="k">assert</span>  <span class="n">out_shape</span> <span class="o">==</span> <span class="n">Nh</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;StateDecoder: Output dimensions (</span><span class="si">{</span><span class="n">out_shape</span><span class="si">}</span><span class="s1">) and Nh (</span><span class="si">{</span><span class="n">Nh</span><span class="si">}</span><span class="s1">) do not match, given reshape_dim=</span><span class="si">{</span><span class="n">reshape_dim</span><span class="si">}</span><span class="s1"> and depth=</span><span class="si">{</span><span class="n">conv_depth</span><span class="si">}</span><span class="s1">.&#39;</span>
+        
+        <span class="k">if</span> <span class="n">mlp_hidden_dim</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">conv_dim</span><span class="o">==</span><span class="mi">1</span><span class="p">:</span>
+                <span class="c1">#self.mlp = MLP([latent_dim, hidden_channels*reshape_dim//2, hidden_channels*reshape_dim], activation)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">mlp</span> <span class="o">=</span> <span class="n">MLP</span><span class="p">([</span><span class="n">latent_dim</span><span class="p">,</span> <span class="n">mlp_hidden_dim</span><span class="p">,</span> <span class="n">reshape_dim</span><span class="p">],</span> <span class="n">activation</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">conv_dim</span><span class="o">==</span><span class="mi">2</span><span class="p">:</span>
+                <span class="c1">#self.mlp = MLP([latent_dim, hidden_channels*reshape_dim**2//2, hidden_channels*reshape_dim**2], activation)</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">reshape_dim</span><span class="p">,</span><span class="nb">int</span><span class="p">):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">mlp</span> <span class="o">=</span> <span class="n">MLP</span><span class="p">([</span><span class="n">latent_dim</span><span class="p">,</span> <span class="n">mlp_hidden_dim</span><span class="p">,</span> <span class="n">reshape_dim</span><span class="o">**</span><span class="mi">2</span><span class="p">],</span> <span class="n">activation</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">reshape_dim</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">mlp</span> <span class="o">=</span> <span class="n">MLP</span><span class="p">([</span><span class="n">latent_dim</span><span class="p">,</span> <span class="n">mlp_hidden_dim</span><span class="p">,</span> <span class="n">reshape_dim</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">reshape_dim</span><span class="p">[</span><span class="mi">1</span><span class="p">]],</span> <span class="n">activation</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mlp</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Identity</span><span class="p">()</span>
+            
+        <span class="c1"># Construction of the convolutional trunk</span>
+        <span class="n">conv_layer</span> <span class="o">=</span> <span class="n">ConvResBlock</span> <span class="k">if</span> <span class="n">residual_blocks</span> <span class="k">else</span> <span class="n">ConvLayer</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">input_block</span> <span class="o">=</span> <span class="n">Upsample</span><span class="p">(</span><span class="n">conv_layer</span><span class="p">(</span><span class="n">hidden_channels</span><span class="p">,</span> <span class="n">hidden_channels</span><span class="p">,</span> <span class="n">conv_dim</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="n">activation</span><span class="p">))</span>
+
+        <span class="n">middle_layers</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">out_ch</span> <span class="o">=</span> <span class="n">hidden_channels</span>
+        <span class="k">assert</span> <span class="n">conv_depth</span><span class="o">&gt;=</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;At least 1 hidden layer is required, consisting of a network with 1 input and 1 output layers.&#39;</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">conv_depth</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+            <span class="n">in_ch</span> <span class="o">=</span> <span class="n">hidden_channels</span><span class="o">//</span><span class="mi">2</span><span class="o">**</span><span class="n">i</span>
+            <span class="n">out_ch</span> <span class="o">=</span> <span class="n">hidden_channels</span><span class="o">//</span><span class="mi">2</span><span class="o">**</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">middle_layers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Upsample</span><span class="p">(</span><span class="n">conv_layer</span><span class="p">(</span><span class="n">in_ch</span><span class="p">,</span> <span class="n">out_ch</span><span class="p">,</span> <span class="n">conv_dim</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="n">activation</span><span class="p">)))</span>    
+        <span class="bp">self</span><span class="o">.</span><span class="n">middle_block</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span><span class="o">*</span><span class="n">middle_layers</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">output_block</span> <span class="o">=</span> <span class="n">ConvLayer</span><span class="p">(</span><span class="n">out_ch</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">out_channels</span><span class="p">,</span> <span class="n">conv_dim</span><span class="p">,</span> <span class="n">last</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    
+    <span class="k">def</span> <span class="nf">__add_channels</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">h</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Adds channels to the hidden state, previously processed by the input MLP.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="n">h</span><span class="o">.</span><span class="n">dim</span><span class="p">()</span><span class="o">==</span><span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">h</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">expand</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hidden_channels</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">h</span><span class="o">.</span><span class="n">dim</span><span class="p">()</span><span class="o">==</span><span class="mi">2</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">h</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">expand</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">hidden_channels</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">h</span><span class="o">.</span><span class="n">dim</span><span class="p">()</span><span class="o">==</span><span class="mi">3</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">h</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">expand</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">hidden_channels</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__in_reshape</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">h</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Reshapes the hidden state to be processed by the convolutional trunk.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">conv_dim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">h</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">hidden_channels</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">reshape_dim</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">conv_dim</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">reshape_dim</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">h</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">hidden_channels</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">reshape_dim</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">reshape_dim</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">reshape_dim</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">h</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">hidden_channels</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">reshape_dim</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">reshape_dim</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            
+    <span class="k">def</span> <span class="nf">__out_reshape</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">h</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">z</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Reshapes the output to comply with original dimensions (Nh).</span>
+<span class="sd">        Depends on batching, time sequencing and convolutions&#39; dimensions.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="n">z</span><span class="o">.</span><span class="n">dim</span><span class="p">()</span><span class="o">==</span><span class="mi">3</span><span class="p">:</span>
+            <span class="n">T</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">z</span><span class="o">.</span><span class="n">shape</span>
+            <span class="k">return</span> <span class="n">h</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">T</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Nh</span><span class="p">)</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="n">z</span><span class="o">.</span><span class="n">dim</span><span class="p">()</span><span class="o">==</span><span class="mi">2</span><span class="p">:</span>
+            <span class="n">B</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">z</span><span class="o">.</span><span class="n">shape</span>
+            <span class="k">return</span> <span class="n">h</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">B</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Nh</span><span class="p">)</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="n">z</span><span class="o">.</span><span class="n">dim</span><span class="p">()</span><span class="o">==</span><span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">h</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Nh</span><span class="p">)</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span>
+
+<div class="viewcode-block" id="StateDecoder.forward"><a class="viewcode-back" href="../../../torchnldm.model.html#torchnldm.model.ae.StateDecoder.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">z</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+        <span class="n">h</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mlp</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
+        <span class="n">h</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__add_channels</span><span class="p">(</span><span class="n">h</span><span class="p">)</span>
+        <span class="n">h</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__in_reshape</span><span class="p">(</span><span class="n">h</span><span class="p">)</span>
+        <span class="n">h</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_block</span><span class="p">(</span><span class="n">h</span><span class="p">)</span>
+        <span class="n">h</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">middle_block</span><span class="p">(</span><span class="n">h</span><span class="p">)</span>
+        <span class="n">h</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_block</span><span class="p">(</span><span class="n">h</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__out_reshape</span><span class="p">(</span><span class="n">h</span><span class="p">,</span><span class="n">z</span><span class="p">)</span></div></div>
+    
+
+<div class="viewcode-block" id="FieldDecoder"><a class="viewcode-back" href="../../../torchnldm.model.html#torchnldm.model.ae.FieldDecoder">[docs]</a><span class="k">class</span> <span class="nc">FieldDecoder</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Field Decoder class.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        :n: (int), dimension of the continuos state u(x,t;mu).</span>
+<span class="sd">        :Np: (int), dimension of the parameters vector (mu,t), dim=(Nmu + 1).</span>
+<span class="sd">        :d: (int), dimension of the spatial domain (n coordinates).</span>
+<span class="sd">        :latent_dim: (int), dimension of the output latent encoding.</span>
+<span class="sd">        :depth: (int), number of layers of the MLPs.</span>
+<span class="sd">        :hidden_dim: (int), MLPs&#39; hidden layers size.</span>
+<span class="sd">        :activation: (str), activation of the state and parameter encoders.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+                 <span class="n">d</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> 
+                 <span class="n">latent_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+                 <span class="n">depth</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
+                 <span class="n">hidden_dim</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">64</span><span class="p">,</span>
+                 <span class="n">activation</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;elu&#39;</span><span class="p">,</span>
+                 <span class="n">architecture</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;hidden_sum&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n</span> <span class="o">=</span> <span class="n">n</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">d</span> <span class="o">=</span> <span class="n">d</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">latent_dim</span> <span class="o">=</span> <span class="n">latent_dim</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">depth</span> <span class="o">=</span> <span class="n">depth</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hidden_dim</span> <span class="o">=</span> <span class="n">hidden_dim</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">activation</span> <span class="o">=</span> <span class="n">activation</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">architecture</span> <span class="o">=</span> <span class="n">architecture</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">architecture</span> <span class="ow">in</span> <span class="n">_hidden_op_layers</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">net</span> <span class="o">=</span> <span class="n">HiddenOpNet</span><span class="p">(</span><span class="n">input_dim</span> <span class="o">=</span> <span class="n">latent_dim</span><span class="p">,</span>
+                                   <span class="n">cond_input_dim</span> <span class="o">=</span> <span class="n">d</span><span class="p">,</span>
+                                   <span class="n">output_dim</span> <span class="o">=</span> <span class="n">n</span><span class="p">,</span>
+                                   <span class="n">hidden_dim</span> <span class="o">=</span> <span class="n">hidden_dim</span><span class="p">,</span> 
+                                   <span class="n">depth</span> <span class="o">=</span> <span class="n">depth</span><span class="p">,</span>
+                                   <span class="n">activation</span> <span class="o">=</span> <span class="n">activation</span><span class="p">,</span>
+                                   <span class="n">positional_encoding</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+                                   <span class="n">architecture</span> <span class="o">=</span> <span class="n">architecture</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">architecture</span> <span class="o">==</span> <span class="s1">&#39;mlp&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">net</span> <span class="o">=</span> <span class="n">MLP</span><span class="p">(</span><span class="n">latent_dim</span><span class="o">+</span><span class="n">d</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">hidden_dim</span><span class="p">,</span> <span class="n">depth</span><span class="p">,</span> <span class="n">activation</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">architecture</span> <span class="o">==</span> <span class="s1">&#39;mlp_no_coords&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">net</span> <span class="o">=</span> <span class="n">MLP</span><span class="p">(</span><span class="n">latent_dim</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">hidden_dim</span><span class="p">,</span> <span class="n">depth</span><span class="p">,</span> <span class="n">activation</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Available networks types are: </span><span class="si">{</span><span class="n">_hidden_op_layers</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span><span class="si">}</span><span class="s1"> or &quot;mlp&quot; or &quot;mlp_no_coords&quot;, got instead </span><span class="si">{</span><span class="n">architecture</span><span class="si">}</span><span class="s1">.&#39;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="FieldDecoder.forward"><a class="viewcode-back" href="../../../torchnldm.model.html#torchnldm.model.ae.FieldDecoder.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">z</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">architecture</span> <span class="ow">in</span> <span class="n">_hidden_op_layers</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">net</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> 
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">architecture</span> <span class="o">==</span> <span class="s1">&#39;mlp&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">net</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">z</span><span class="p">,</span><span class="n">x</span><span class="p">],</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span> 
+        <span class="k">else</span><span class="p">:</span> 
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">net</span><span class="p">(</span><span class="n">z</span><span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Nicola Farenga.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

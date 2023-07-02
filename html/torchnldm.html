@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>torchnldm package &mdash; TorchNLDM 0.1 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            TorchNLDM
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="torchnldm.data.html">torchnldm.data package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torchnldm.model.html">torchnldm.model package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torchnldm.train.html">torchnldm.train package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torchnldm.evaluate.html">torchnldm.evaluate package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torchnldm.utils.html">torchnldm.utils package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">TorchNLDM</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">torchnldm package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/torchnldm.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="torchnldm-package">
+<h1>torchnldm package<a class="headerlink" href="#torchnldm-package" title="Permalink to this heading"></a></h1>
+<section id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this heading"></a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="torchnldm.data.html">torchnldm.data package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="torchnldm.data.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="torchnldm.data.html#module-torchnldm.data.dataloader">torchnldm.data.dataloader module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="torchnldm.data.html#torchnldm.data.dataloader.DataLoader"><code class="docutils literal notranslate"><span class="pre">DataLoader</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.data.html#torchnldm.data.dataloader.DataLoader.get_batch"><code class="docutils literal notranslate"><span class="pre">DataLoader.get_batch()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.data.html#torchnldm.data.dataloader.DataLoader.get_sample"><code class="docutils literal notranslate"><span class="pre">DataLoader.get_sample()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.data.html#torchnldm.data.dataloader.DataLoader.get_scaler_parameters"><code class="docutils literal notranslate"><span class="pre">DataLoader.get_scaler_parameters()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.data.html#torchnldm.data.dataloader.DataLoader.get_section"><code class="docutils literal notranslate"><span class="pre">DataLoader.get_section()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.data.html#torchnldm.data.dataloader.DataLoader.get_train_t0_indices"><code class="docutils literal notranslate"><span class="pre">DataLoader.get_train_t0_indices()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.data.html#torchnldm.data.dataloader.DataLoader.get_trajectory"><code class="docutils literal notranslate"><span class="pre">DataLoader.get_trajectory()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.data.html#torchnldm.data.dataloader.DataLoader.summary"><code class="docutils literal notranslate"><span class="pre">DataLoader.summary()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.data.html#torchnldm.data.dataloader.DataLoader.to"><code class="docutils literal notranslate"><span class="pre">DataLoader.to()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="torchnldm.data.html#torchnldm.data.dataloader.DataLoaderConfig"><code class="docutils literal notranslate"><span class="pre">DataLoaderConfig</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.data.html#torchnldm.data.dataloader.DataLoaderConfig.device"><code class="docutils literal notranslate"><span class="pre">DataLoaderConfig.device</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.data.html#torchnldm.data.dataloader.DataLoaderConfig.filepath"><code class="docutils literal notranslate"><span class="pre">DataLoaderConfig.filepath</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.data.html#torchnldm.data.dataloader.DataLoaderConfig.reduced_dim"><code class="docutils literal notranslate"><span class="pre">DataLoaderConfig.reduced_dim</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.data.html#torchnldm.data.dataloader.DataLoaderConfig.scaler_type"><code class="docutils literal notranslate"><span class="pre">DataLoaderConfig.scaler_type</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.data.html#torchnldm.data.dataloader.DataLoaderConfig.time_subsampling"><code class="docutils literal notranslate"><span class="pre">DataLoaderConfig.time_subsampling</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.data.html#torchnldm.data.dataloader.DataLoaderConfig.time_validation_split"><code class="docutils literal notranslate"><span class="pre">DataLoaderConfig.time_validation_split</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="torchnldm.data.html#module-torchnldm.data.datascaler">torchnldm.data.datascaler module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="torchnldm.data.html#torchnldm.data.datascaler.DataScaler"><code class="docutils literal notranslate"><span class="pre">DataScaler</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.data.html#torchnldm.data.datascaler.DataScaler.scale_dataset"><code class="docutils literal notranslate"><span class="pre">DataScaler.scale_dataset()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.data.html#torchnldm.data.datascaler.DataScaler.scale_feature"><code class="docutils literal notranslate"><span class="pre">DataScaler.scale_feature()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="torchnldm.data.html#module-torchnldm.data">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="torchnldm.evaluate.html">torchnldm.evaluate package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="torchnldm.evaluate.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="torchnldm.evaluate.html#module-torchnldm.evaluate.evaluator">torchnldm.evaluate.evaluator module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="torchnldm.evaluate.html#torchnldm.evaluate.evaluator.Evaluator"><code class="docutils literal notranslate"><span class="pre">Evaluator</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.evaluate.html#torchnldm.evaluate.evaluator.Evaluator.eval"><code class="docutils literal notranslate"><span class="pre">Evaluator.eval()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="torchnldm.evaluate.html#torchnldm.evaluate.evaluator.EvaluatorConfig"><code class="docutils literal notranslate"><span class="pre">EvaluatorConfig</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.evaluate.html#torchnldm.evaluate.evaluator.EvaluatorConfig.compile_mode"><code class="docutils literal notranslate"><span class="pre">EvaluatorConfig.compile_mode</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.evaluate.html#torchnldm.evaluate.evaluator.EvaluatorConfig.device"><code class="docutils literal notranslate"><span class="pre">EvaluatorConfig.device</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.evaluate.html#torchnldm.evaluate.evaluator.EvaluatorConfig.enable_amp"><code class="docutils literal notranslate"><span class="pre">EvaluatorConfig.enable_amp</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.evaluate.html#torchnldm.evaluate.evaluator.EvaluatorConfig.enable_scaling"><code class="docutils literal notranslate"><span class="pre">EvaluatorConfig.enable_scaling</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.evaluate.html#torchnldm.evaluate.evaluator.EvaluatorConfig.enable_tf32"><code class="docutils literal notranslate"><span class="pre">EvaluatorConfig.enable_tf32</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.evaluate.html#torchnldm.evaluate.evaluator.EvaluatorConfig.metrics_filename"><code class="docutils literal notranslate"><span class="pre">EvaluatorConfig.metrics_filename</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.evaluate.html#torchnldm.evaluate.evaluator.EvaluatorConfig.output_directory"><code class="docutils literal notranslate"><span class="pre">EvaluatorConfig.output_directory</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.evaluate.html#torchnldm.evaluate.evaluator.EvaluatorConfig.sample_subtrajectories"><code class="docutils literal notranslate"><span class="pre">EvaluatorConfig.sample_subtrajectories</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.evaluate.html#torchnldm.evaluate.evaluator.EvaluatorConfig.start_t_index"><code class="docutils literal notranslate"><span class="pre">EvaluatorConfig.start_t_index</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.evaluate.html#torchnldm.evaluate.evaluator.EvaluatorConfig.timesteps"><code class="docutils literal notranslate"><span class="pre">EvaluatorConfig.timesteps</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="torchnldm.evaluate.html#module-torchnldm.evaluate">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="torchnldm.model.html">torchnldm.model package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="torchnldm.model.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="torchnldm.model.html#module-torchnldm.model.ae">torchnldm.model.ae module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="torchnldm.model.html#torchnldm.model.ae.FieldDecoder"><code class="docutils literal notranslate"><span class="pre">FieldDecoder</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.model.html#torchnldm.model.ae.FieldDecoder.forward"><code class="docutils literal notranslate"><span class="pre">FieldDecoder.forward()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="torchnldm.model.html#torchnldm.model.ae.FieldEncoder"><code class="docutils literal notranslate"><span class="pre">FieldEncoder</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.model.html#torchnldm.model.ae.FieldEncoder.forward"><code class="docutils literal notranslate"><span class="pre">FieldEncoder.forward()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="torchnldm.model.html#torchnldm.model.ae.StateDecoder"><code class="docutils literal notranslate"><span class="pre">StateDecoder</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.model.html#torchnldm.model.ae.StateDecoder.forward"><code class="docutils literal notranslate"><span class="pre">StateDecoder.forward()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="torchnldm.model.html#torchnldm.model.ae.StateEncoder"><code class="docutils literal notranslate"><span class="pre">StateEncoder</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.model.html#torchnldm.model.ae.StateEncoder.forward"><code class="docutils literal notranslate"><span class="pre">StateEncoder.forward()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="torchnldm.model.html#module-torchnldm.model.nde">torchnldm.model.nde module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="torchnldm.model.html#torchnldm.model.nde.NeuralDE"><code class="docutils literal notranslate"><span class="pre">NeuralDE</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.model.html#torchnldm.model.nde.NeuralDE.forward"><code class="docutils literal notranslate"><span class="pre">NeuralDE.forward()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.model.html#torchnldm.model.nde.NeuralDE.wrap_nvf"><code class="docutils literal notranslate"><span class="pre">NeuralDE.wrap_nvf()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="torchnldm.model.html#torchnldm.model.nde.NeuralODE"><code class="docutils literal notranslate"><span class="pre">NeuralODE</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.model.html#torchnldm.model.nde.NeuralODE.forward"><code class="docutils literal notranslate"><span class="pre">NeuralODE.forward()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="torchnldm.model.html#torchnldm.model.nde.NeuralSDE"><code class="docutils literal notranslate"><span class="pre">NeuralSDE</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.model.html#torchnldm.model.nde.NeuralSDE.forward"><code class="docutils literal notranslate"><span class="pre">NeuralSDE.forward()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="torchnldm.model.html#torchnldm.model.nde.NeuralVectorField"><code class="docutils literal notranslate"><span class="pre">NeuralVectorField</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.model.html#torchnldm.model.nde.NeuralVectorField.forward"><code class="docutils literal notranslate"><span class="pre">NeuralVectorField.forward()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="torchnldm.model.html#module-torchnldm.model.nldm">torchnldm.model.nldm module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="torchnldm.model.html#torchnldm.model.nldm.NLDF"><code class="docutils literal notranslate"><span class="pre">NLDF</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.model.html#torchnldm.model.nldm.NLDF.forward"><code class="docutils literal notranslate"><span class="pre">NLDF.forward()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.model.html#torchnldm.model.nldm.NLDF.get_batch_loss"><code class="docutils literal notranslate"><span class="pre">NLDF.get_batch_loss()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.model.html#torchnldm.model.nldm.NLDF.loss"><code class="docutils literal notranslate"><span class="pre">NLDF.loss()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.model.html#torchnldm.model.nldm.NLDF.loss_criterion"><code class="docutils literal notranslate"><span class="pre">NLDF.loss_criterion()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.model.html#torchnldm.model.nldm.NLDF.postprocess"><code class="docutils literal notranslate"><span class="pre">NLDF.postprocess()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.model.html#torchnldm.model.nldm.NLDF.predict_trajectory"><code class="docutils literal notranslate"><span class="pre">NLDF.predict_trajectory()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.model.html#torchnldm.model.nldm.NLDF.preprocess"><code class="docutils literal notranslate"><span class="pre">NLDF.preprocess()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="torchnldm.model.html#torchnldm.model.nldm.NLDFConfig"><code class="docutils literal notranslate"><span class="pre">NLDFConfig</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.model.html#torchnldm.model.nldm.NLDFConfig.Np"><code class="docutils literal notranslate"><span class="pre">NLDFConfig.Np</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.model.html#torchnldm.model.nldm.NLDFConfig.ae_activation"><code class="docutils literal notranslate"><span class="pre">NLDFConfig.ae_activation</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.model.html#torchnldm.model.nldm.NLDFConfig.d"><code class="docutils literal notranslate"><span class="pre">NLDFConfig.d</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.model.html#torchnldm.model.nldm.NLDFConfig.decoder_architecture"><code class="docutils literal notranslate"><span class="pre">NLDFConfig.decoder_architecture</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.model.html#torchnldm.model.nldm.NLDFConfig.decoder_depth"><code class="docutils literal notranslate"><span class="pre">NLDFConfig.decoder_depth</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.model.html#torchnldm.model.nldm.NLDFConfig.decoder_hidden_dim"><code class="docutils literal notranslate"><span class="pre">NLDFConfig.decoder_hidden_dim</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.model.html#torchnldm.model.nldm.NLDFConfig.device"><code class="docutils literal notranslate"><span class="pre">NLDFConfig.device</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.model.html#torchnldm.model.nldm.NLDFConfig.encoder_architecture"><code class="docutils literal notranslate"><span class="pre">NLDFConfig.encoder_architecture</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.model.html#torchnldm.model.nldm.NLDFConfig.encoder_depth"><code class="docutils literal notranslate"><span class="pre">NLDFConfig.encoder_depth</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.model.html#torchnldm.model.nldm.NLDFConfig.encoder_hidden_dim"><code class="docutils literal notranslate"><span class="pre">NLDFConfig.encoder_hidden_dim</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.model.html#torchnldm.model.nldm.NLDFConfig.latent_dim"><code class="docutils literal notranslate"><span class="pre">NLDFConfig.latent_dim</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.model.html#torchnldm.model.nldm.NLDFConfig.n"><code class="docutils literal notranslate"><span class="pre">NLDFConfig.n</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.model.html#torchnldm.model.nldm.NLDFConfig.nde_activation"><code class="docutils literal notranslate"><span class="pre">NLDFConfig.nde_activation</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.model.html#torchnldm.model.nldm.NLDFConfig.nde_adjoint"><code class="docutils literal notranslate"><span class="pre">NLDFConfig.nde_adjoint</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.model.html#torchnldm.model.nldm.NLDFConfig.nde_depth"><code class="docutils literal notranslate"><span class="pre">NLDFConfig.nde_depth</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.model.html#torchnldm.model.nldm.NLDFConfig.nde_hidden_dim"><code class="docutils literal notranslate"><span class="pre">NLDFConfig.nde_hidden_dim</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.model.html#torchnldm.model.nldm.NLDFConfig.nde_integration_method"><code class="docutils literal notranslate"><span class="pre">NLDFConfig.nde_integration_method</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.model.html#torchnldm.model.nldm.NLDFConfig.nde_type"><code class="docutils literal notranslate"><span class="pre">NLDFConfig.nde_type</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="torchnldm.model.html#torchnldm.model.nldm.NLDM"><code class="docutils literal notranslate"><span class="pre">NLDM</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.model.html#torchnldm.model.nldm.NLDM.POD_layer"><code class="docutils literal notranslate"><span class="pre">NLDM.POD_layer()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.model.html#torchnldm.model.nldm.NLDM.add_POD_layer"><code class="docutils literal notranslate"><span class="pre">NLDM.add_POD_layer()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.model.html#torchnldm.model.nldm.NLDM.forward"><code class="docutils literal notranslate"><span class="pre">NLDM.forward()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.model.html#torchnldm.model.nldm.NLDM.get_batch_loss"><code class="docutils literal notranslate"><span class="pre">NLDM.get_batch_loss()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.model.html#torchnldm.model.nldm.NLDM.loss"><code class="docutils literal notranslate"><span class="pre">NLDM.loss()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.model.html#torchnldm.model.nldm.NLDM.loss_criterion"><code class="docutils literal notranslate"><span class="pre">NLDM.loss_criterion()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.model.html#torchnldm.model.nldm.NLDM.postprocess"><code class="docutils literal notranslate"><span class="pre">NLDM.postprocess()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.model.html#torchnldm.model.nldm.NLDM.predict_trajectory"><code class="docutils literal notranslate"><span class="pre">NLDM.predict_trajectory()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.model.html#torchnldm.model.nldm.NLDM.preprocess"><code class="docutils literal notranslate"><span class="pre">NLDM.preprocess()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="torchnldm.model.html#torchnldm.model.nldm.NLDMBase"><code class="docutils literal notranslate"><span class="pre">NLDMBase</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.model.html#torchnldm.model.nldm.NLDMBase.adjoint"><code class="docutils literal notranslate"><span class="pre">NLDMBase.adjoint</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.model.html#torchnldm.model.nldm.NLDMBase.bidirectional"><code class="docutils literal notranslate"><span class="pre">NLDMBase.bidirectional</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.model.html#torchnldm.model.nldm.NLDMBase.evaluate"><code class="docutils literal notranslate"><span class="pre">NLDMBase.evaluate()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.model.html#torchnldm.model.nldm.NLDMBase.forward"><code class="docutils literal notranslate"><span class="pre">NLDMBase.forward()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.model.html#torchnldm.model.nldm.NLDMBase.get_batch_loss"><code class="docutils literal notranslate"><span class="pre">NLDMBase.get_batch_loss()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.model.html#torchnldm.model.nldm.NLDMBase.latent_guidance"><code class="docutils literal notranslate"><span class="pre">NLDMBase.latent_guidance</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.model.html#torchnldm.model.nldm.NLDMBase.load_model_from_checkpoint"><code class="docutils literal notranslate"><span class="pre">NLDMBase.load_model_from_checkpoint()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.model.html#torchnldm.model.nldm.NLDMBase.load_scaler_from_checkpoint"><code class="docutils literal notranslate"><span class="pre">NLDMBase.load_scaler_from_checkpoint()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.model.html#torchnldm.model.nldm.NLDMBase.load_scaler_from_dataset"><code class="docutils literal notranslate"><span class="pre">NLDMBase.load_scaler_from_dataset()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.model.html#torchnldm.model.nldm.NLDMBase.loss"><code class="docutils literal notranslate"><span class="pre">NLDMBase.loss()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.model.html#torchnldm.model.nldm.NLDMBase.loss_criterion"><code class="docutils literal notranslate"><span class="pre">NLDMBase.loss_criterion()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.model.html#torchnldm.model.nldm.NLDMBase.nde_adjoint"><code class="docutils literal notranslate"><span class="pre">NLDMBase.nde_adjoint</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.model.html#torchnldm.model.nldm.NLDMBase.nde_integration_method"><code class="docutils literal notranslate"><span class="pre">NLDMBase.nde_integration_method</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.model.html#torchnldm.model.nldm.NLDMBase.predict_trajectory"><code class="docutils literal notranslate"><span class="pre">NLDMBase.predict_trajectory()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.model.html#torchnldm.model.nldm.NLDMBase.summary"><code class="docutils literal notranslate"><span class="pre">NLDMBase.summary()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.model.html#torchnldm.model.nldm.NLDMBase.training_epoch"><code class="docutils literal notranslate"><span class="pre">NLDMBase.training_epoch()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.model.html#torchnldm.model.nldm.NLDMBase.validation_epoch"><code class="docutils literal notranslate"><span class="pre">NLDMBase.validation_epoch()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="torchnldm.model.html#torchnldm.model.nldm.NLDMConfig"><code class="docutils literal notranslate"><span class="pre">NLDMConfig</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.model.html#torchnldm.model.nldm.NLDMConfig.Nh"><code class="docutils literal notranslate"><span class="pre">NLDMConfig.Nh</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.model.html#torchnldm.model.nldm.NLDMConfig.Np"><code class="docutils literal notranslate"><span class="pre">NLDMConfig.Np</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.model.html#torchnldm.model.nldm.NLDMConfig.ae_activation"><code class="docutils literal notranslate"><span class="pre">NLDMConfig.ae_activation</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.model.html#torchnldm.model.nldm.NLDMConfig.ae_conv_dim"><code class="docutils literal notranslate"><span class="pre">NLDMConfig.ae_conv_dim</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.model.html#torchnldm.model.nldm.NLDMConfig.ae_residual_blocks"><code class="docutils literal notranslate"><span class="pre">NLDMConfig.ae_residual_blocks</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.model.html#torchnldm.model.nldm.NLDMConfig.decoder_conv_depth"><code class="docutils literal notranslate"><span class="pre">NLDMConfig.decoder_conv_depth</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.model.html#torchnldm.model.nldm.NLDMConfig.decoder_conv_hidden_channels"><code class="docutils literal notranslate"><span class="pre">NLDMConfig.decoder_conv_hidden_channels</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.model.html#torchnldm.model.nldm.NLDMConfig.decoder_mlp_state_hidden_dim"><code class="docutils literal notranslate"><span class="pre">NLDMConfig.decoder_mlp_state_hidden_dim</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.model.html#torchnldm.model.nldm.NLDMConfig.decoder_reshape_dim"><code class="docutils literal notranslate"><span class="pre">NLDMConfig.decoder_reshape_dim</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.model.html#torchnldm.model.nldm.NLDMConfig.device"><code class="docutils literal notranslate"><span class="pre">NLDMConfig.device</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.model.html#torchnldm.model.nldm.NLDMConfig.encoder_conv_depth"><code class="docutils literal notranslate"><span class="pre">NLDMConfig.encoder_conv_depth</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.model.html#torchnldm.model.nldm.NLDMConfig.encoder_conv_hidden_channels"><code class="docutils literal notranslate"><span class="pre">NLDMConfig.encoder_conv_hidden_channels</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.model.html#torchnldm.model.nldm.NLDMConfig.encoder_mlp_param_depth"><code class="docutils literal notranslate"><span class="pre">NLDMConfig.encoder_mlp_param_depth</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.model.html#torchnldm.model.nldm.NLDMConfig.encoder_mlp_param_hidden_dim"><code class="docutils literal notranslate"><span class="pre">NLDMConfig.encoder_mlp_param_hidden_dim</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.model.html#torchnldm.model.nldm.NLDMConfig.encoder_mlp_state_hidden_dim"><code class="docutils literal notranslate"><span class="pre">NLDMConfig.encoder_mlp_state_hidden_dim</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.model.html#torchnldm.model.nldm.NLDMConfig.encoder_mlp_time_depth"><code class="docutils literal notranslate"><span class="pre">NLDMConfig.encoder_mlp_time_depth</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.model.html#torchnldm.model.nldm.NLDMConfig.encoder_mlp_time_hidden_dim"><code class="docutils literal notranslate"><span class="pre">NLDMConfig.encoder_mlp_time_hidden_dim</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.model.html#torchnldm.model.nldm.NLDMConfig.encoder_param_emb"><code class="docutils literal notranslate"><span class="pre">NLDMConfig.encoder_param_emb</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.model.html#torchnldm.model.nldm.NLDMConfig.encoder_reshape_dim"><code class="docutils literal notranslate"><span class="pre">NLDMConfig.encoder_reshape_dim</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.model.html#torchnldm.model.nldm.NLDMConfig.latent_dim"><code class="docutils literal notranslate"><span class="pre">NLDMConfig.latent_dim</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.model.html#torchnldm.model.nldm.NLDMConfig.nde_activation"><code class="docutils literal notranslate"><span class="pre">NLDMConfig.nde_activation</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.model.html#torchnldm.model.nldm.NLDMConfig.nde_adjoint"><code class="docutils literal notranslate"><span class="pre">NLDMConfig.nde_adjoint</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.model.html#torchnldm.model.nldm.NLDMConfig.nde_depth"><code class="docutils literal notranslate"><span class="pre">NLDMConfig.nde_depth</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.model.html#torchnldm.model.nldm.NLDMConfig.nde_hidden_dim"><code class="docutils literal notranslate"><span class="pre">NLDMConfig.nde_hidden_dim</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.model.html#torchnldm.model.nldm.NLDMConfig.nde_integration_method"><code class="docutils literal notranslate"><span class="pre">NLDMConfig.nde_integration_method</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.model.html#torchnldm.model.nldm.NLDMConfig.nde_type"><code class="docutils literal notranslate"><span class="pre">NLDMConfig.nde_type</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.model.html#torchnldm.model.nldm.NLDMConfig.state_channels"><code class="docutils literal notranslate"><span class="pre">NLDMConfig.state_channels</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="torchnldm.model.html#module-torchnldm.model">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="torchnldm.train.html">torchnldm.train package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="torchnldm.train.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="torchnldm.train.html#module-torchnldm.train.trainer">torchnldm.train.trainer module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="torchnldm.train.html#torchnldm.train.trainer.Trainer"><code class="docutils literal notranslate"><span class="pre">Trainer</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.train.html#torchnldm.train.trainer.Trainer.train"><code class="docutils literal notranslate"><span class="pre">Trainer.train()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="torchnldm.train.html#torchnldm.train.trainer.TrainerConfig"><code class="docutils literal notranslate"><span class="pre">TrainerConfig</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.train.html#torchnldm.train.trainer.TrainerConfig.batch_size_nodes"><code class="docutils literal notranslate"><span class="pre">TrainerConfig.batch_size_nodes</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.train.html#torchnldm.train.trainer.TrainerConfig.batch_size_params"><code class="docutils literal notranslate"><span class="pre">TrainerConfig.batch_size_params</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.train.html#torchnldm.train.trainer.TrainerConfig.batch_size_timesteps"><code class="docutils literal notranslate"><span class="pre">TrainerConfig.batch_size_timesteps</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.train.html#torchnldm.train.trainer.TrainerConfig.bidirectional"><code class="docutils literal notranslate"><span class="pre">TrainerConfig.bidirectional</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.train.html#torchnldm.train.trainer.TrainerConfig.compile_mode"><code class="docutils literal notranslate"><span class="pre">TrainerConfig.compile_mode</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.train.html#torchnldm.train.trainer.TrainerConfig.device"><code class="docutils literal notranslate"><span class="pre">TrainerConfig.device</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.train.html#torchnldm.train.trainer.TrainerConfig.enable_amp"><code class="docutils literal notranslate"><span class="pre">TrainerConfig.enable_amp</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.train.html#torchnldm.train.trainer.TrainerConfig.enable_tf32"><code class="docutils literal notranslate"><span class="pre">TrainerConfig.enable_tf32</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.train.html#torchnldm.train.trainer.TrainerConfig.lambda_l2"><code class="docutils literal notranslate"><span class="pre">TrainerConfig.lambda_l2</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.train.html#torchnldm.train.trainer.TrainerConfig.latent_guidance"><code class="docutils literal notranslate"><span class="pre">TrainerConfig.latent_guidance</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.train.html#torchnldm.train.trainer.TrainerConfig.lr"><code class="docutils literal notranslate"><span class="pre">TrainerConfig.lr</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.train.html#torchnldm.train.trainer.TrainerConfig.lr_scheduler"><code class="docutils literal notranslate"><span class="pre">TrainerConfig.lr_scheduler</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.train.html#torchnldm.train.trainer.TrainerConfig.metrics_filename"><code class="docutils literal notranslate"><span class="pre">TrainerConfig.metrics_filename</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.train.html#torchnldm.train.trainer.TrainerConfig.n_epochs"><code class="docutils literal notranslate"><span class="pre">TrainerConfig.n_epochs</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.train.html#torchnldm.train.trainer.TrainerConfig.optimizer"><code class="docutils literal notranslate"><span class="pre">TrainerConfig.optimizer</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.train.html#torchnldm.train.trainer.TrainerConfig.output_directory"><code class="docutils literal notranslate"><span class="pre">TrainerConfig.output_directory</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.train.html#torchnldm.train.trainer.TrainerConfig.save_best_checkpoints"><code class="docutils literal notranslate"><span class="pre">TrainerConfig.save_best_checkpoints</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.train.html#torchnldm.train.trainer.TrainerConfig.save_checkpoints_freq"><code class="docutils literal notranslate"><span class="pre">TrainerConfig.save_checkpoints_freq</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.train.html#torchnldm.train.trainer.TrainerConfig.validation"><code class="docutils literal notranslate"><span class="pre">TrainerConfig.validation</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.train.html#torchnldm.train.trainer.TrainerConfig.warmup_lr"><code class="docutils literal notranslate"><span class="pre">TrainerConfig.warmup_lr</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.train.html#torchnldm.train.trainer.TrainerConfig.warmup_n_epochs"><code class="docutils literal notranslate"><span class="pre">TrainerConfig.warmup_n_epochs</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="torchnldm.train.html#module-torchnldm.train">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="torchnldm.utils.html">torchnldm.utils package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="torchnldm.utils.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="torchnldm.utils.html#module-torchnldm.utils.addtypes">torchnldm.utils.addtypes module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="torchnldm.utils.html#module-torchnldm.utils.config">torchnldm.utils.config module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="torchnldm.utils.html#torchnldm.utils.config.ConfigBase"><code class="docutils literal notranslate"><span class="pre">ConfigBase</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.utils.html#torchnldm.utils.config.ConfigBase.save"><code class="docutils literal notranslate"><span class="pre">ConfigBase.save()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="torchnldm.utils.html#torchnldm.utils.config.ConfigJSONEncoder"><code class="docutils literal notranslate"><span class="pre">ConfigJSONEncoder</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.utils.html#torchnldm.utils.config.ConfigJSONEncoder.default"><code class="docutils literal notranslate"><span class="pre">ConfigJSONEncoder.default()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="torchnldm.utils.html#module-torchnldm.utils.metrics">torchnldm.utils.metrics module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="torchnldm.utils.html#torchnldm.utils.metrics.MetricsLogger"><code class="docutils literal notranslate"><span class="pre">MetricsLogger</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.utils.html#torchnldm.utils.metrics.MetricsLogger.print_current"><code class="docutils literal notranslate"><span class="pre">MetricsLogger.print_current()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.utils.html#torchnldm.utils.metrics.MetricsLogger.save"><code class="docutils literal notranslate"><span class="pre">MetricsLogger.save()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.utils.html#torchnldm.utils.metrics.MetricsLogger.update"><code class="docutils literal notranslate"><span class="pre">MetricsLogger.update()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="torchnldm.utils.html#torchnldm.utils.metrics.assert_dim_shape"><code class="docutils literal notranslate"><span class="pre">assert_dim_shape()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="torchnldm.utils.html#torchnldm.utils.metrics.error"><code class="docutils literal notranslate"><span class="pre">error()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="torchnldm.utils.html#torchnldm.utils.metrics.loss_criterion"><code class="docutils literal notranslate"><span class="pre">loss_criterion()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="torchnldm.utils.html#torchnldm.utils.metrics.relative_error"><code class="docutils literal notranslate"><span class="pre">relative_error()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="torchnldm.utils.html#torchnldm.utils.metrics.relative_error_vectorized"><code class="docutils literal notranslate"><span class="pre">relative_error_vectorized()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="torchnldm.utils.html#module-torchnldm.utils.model">torchnldm.utils.model module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="torchnldm.utils.html#torchnldm.utils.model.get_layers_sizes"><code class="docutils literal notranslate"><span class="pre">get_layers_sizes()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="torchnldm.utils.html#torchnldm.utils.model.get_model_params"><code class="docutils literal notranslate"><span class="pre">get_model_params()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="torchnldm.utils.html#torchnldm.utils.model.model_summary"><code class="docutils literal notranslate"><span class="pre">model_summary()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="torchnldm.utils.html#module-torchnldm.utils.nn">torchnldm.utils.nn module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="torchnldm.utils.html#torchnldm.utils.nn.Activation"><code class="docutils literal notranslate"><span class="pre">Activation</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.utils.html#torchnldm.utils.nn.Activation.forward"><code class="docutils literal notranslate"><span class="pre">Activation.forward()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="torchnldm.utils.html#torchnldm.utils.nn.ConvBlock"><code class="docutils literal notranslate"><span class="pre">ConvBlock</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.utils.html#torchnldm.utils.nn.ConvBlock.forward"><code class="docutils literal notranslate"><span class="pre">ConvBlock.forward()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="torchnldm.utils.html#torchnldm.utils.nn.ConvLayer"><code class="docutils literal notranslate"><span class="pre">ConvLayer</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.utils.html#torchnldm.utils.nn.ConvLayer.forward"><code class="docutils literal notranslate"><span class="pre">ConvLayer.forward()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="torchnldm.utils.html#torchnldm.utils.nn.ConvResBlock"><code class="docutils literal notranslate"><span class="pre">ConvResBlock</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.utils.html#torchnldm.utils.nn.ConvResBlock.forward"><code class="docutils literal notranslate"><span class="pre">ConvResBlock.forward()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="torchnldm.utils.html#torchnldm.utils.nn.Downsample"><code class="docutils literal notranslate"><span class="pre">Downsample</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.utils.html#torchnldm.utils.nn.Downsample.forward"><code class="docutils literal notranslate"><span class="pre">Downsample.forward()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="torchnldm.utils.html#torchnldm.utils.nn.GaussianFourierMap"><code class="docutils literal notranslate"><span class="pre">GaussianFourierMap</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.utils.html#torchnldm.utils.nn.GaussianFourierMap.forward"><code class="docutils literal notranslate"><span class="pre">GaussianFourierMap.forward()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="torchnldm.utils.html#torchnldm.utils.nn.HadamardLayer"><code class="docutils literal notranslate"><span class="pre">HadamardLayer</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.utils.html#torchnldm.utils.nn.HadamardLayer.forward"><code class="docutils literal notranslate"><span class="pre">HadamardLayer.forward()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="torchnldm.utils.html#torchnldm.utils.nn.HiddenOpNet"><code class="docutils literal notranslate"><span class="pre">HiddenOpNet</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.utils.html#torchnldm.utils.nn.HiddenOpNet.forward"><code class="docutils literal notranslate"><span class="pre">HiddenOpNet.forward()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="torchnldm.utils.html#torchnldm.utils.nn.HiddenSumLayer"><code class="docutils literal notranslate"><span class="pre">HiddenSumLayer</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.utils.html#torchnldm.utils.nn.HiddenSumLayer.forward"><code class="docutils literal notranslate"><span class="pre">HiddenSumLayer.forward()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="torchnldm.utils.html#torchnldm.utils.nn.Hypernetwork"><code class="docutils literal notranslate"><span class="pre">Hypernetwork</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.utils.html#torchnldm.utils.nn.Hypernetwork.forward"><code class="docutils literal notranslate"><span class="pre">Hypernetwork.forward()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.utils.html#torchnldm.utils.nn.Hypernetwork.set_hypernet_dims"><code class="docutils literal notranslate"><span class="pre">Hypernetwork.set_hypernet_dims()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="torchnldm.utils.html#torchnldm.utils.nn.Linear"><code class="docutils literal notranslate"><span class="pre">Linear</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.utils.html#torchnldm.utils.nn.Linear.forward"><code class="docutils literal notranslate"><span class="pre">Linear.forward()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="torchnldm.utils.html#torchnldm.utils.nn.MLP"><code class="docutils literal notranslate"><span class="pre">MLP</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.utils.html#torchnldm.utils.nn.MLP.build_mlp"><code class="docutils literal notranslate"><span class="pre">MLP.build_mlp()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.utils.html#torchnldm.utils.nn.MLP.forward"><code class="docutils literal notranslate"><span class="pre">MLP.forward()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.utils.html#torchnldm.utils.nn.MLP.init_params"><code class="docutils literal notranslate"><span class="pre">MLP.init_params()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="torchnldm.utils.html#torchnldm.utils.nn.PositionalEncoding"><code class="docutils literal notranslate"><span class="pre">PositionalEncoding</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.utils.html#torchnldm.utils.nn.PositionalEncoding.forward"><code class="docutils literal notranslate"><span class="pre">PositionalEncoding.forward()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.utils.html#torchnldm.utils.nn.PositionalEncoding.pe_vmap"><code class="docutils literal notranslate"><span class="pre">PositionalEncoding.pe_vmap()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="torchnldm.utils.html#torchnldm.utils.nn.ResHadamardLayer"><code class="docutils literal notranslate"><span class="pre">ResHadamardLayer</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.utils.html#torchnldm.utils.nn.ResHadamardLayer.forward"><code class="docutils literal notranslate"><span class="pre">ResHadamardLayer.forward()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="torchnldm.utils.html#torchnldm.utils.nn.Sine"><code class="docutils literal notranslate"><span class="pre">Sine</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.utils.html#torchnldm.utils.nn.Sine.forward"><code class="docutils literal notranslate"><span class="pre">Sine.forward()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="torchnldm.utils.html#torchnldm.utils.nn.Upsample"><code class="docutils literal notranslate"><span class="pre">Upsample</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="torchnldm.utils.html#torchnldm.utils.nn.Upsample.forward"><code class="docutils literal notranslate"><span class="pre">Upsample.forward()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="torchnldm.utils.html#module-torchnldm.utils.ops">torchnldm.utils.ops module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="torchnldm.utils.html#torchnldm.utils.ops.POD"><code class="docutils literal notranslate"><span class="pre">POD()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="torchnldm.utils.html#torchnldm.utils.ops.delete_tensor"><code class="docutils literal notranslate"><span class="pre">delete_tensor()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="torchnldm.utils.html#torchnldm.utils.ops.get_meanstd"><code class="docutils literal notranslate"><span class="pre">get_meanstd()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="torchnldm.utils.html#torchnldm.utils.ops.get_minmax"><code class="docutils literal notranslate"><span class="pre">get_minmax()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="torchnldm.utils.html#torchnldm.utils.ops.minmax_scaler"><code class="docutils literal notranslate"><span class="pre">minmax_scaler()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="torchnldm.utils.html#torchnldm.utils.ops.multiple_unsqueeze"><code class="docutils literal notranslate"><span class="pre">multiple_unsqueeze()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="torchnldm.utils.html#torchnldm.utils.ops.set_seed"><code class="docutils literal notranslate"><span class="pre">set_seed()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="torchnldm.utils.html#torchnldm.utils.ops.standard_scaler"><code class="docutils literal notranslate"><span class="pre">standard_scaler()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="torchnldm.utils.html#torchnldm.utils.ops.timing"><code class="docutils literal notranslate"><span class="pre">timing()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="torchnldm.utils.html#module-torchnldm.utils.plot">torchnldm.utils.plot module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="torchnldm.utils.html#torchnldm.utils.plot.get_gridpoints_2d"><code class="docutils literal notranslate"><span class="pre">get_gridpoints_2d()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="torchnldm.utils.html#torchnldm.utils.plot.plot1"><code class="docutils literal notranslate"><span class="pre">plot1()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="torchnldm.utils.html#torchnldm.utils.plot.plot3"><code class="docutils literal notranslate"><span class="pre">plot3()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="torchnldm.utils.html#torchnldm.utils.plot.plot_evolution"><code class="docutils literal notranslate"><span class="pre">plot_evolution()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="torchnldm.utils.html#torchnldm.utils.plot.plot_evolution_error"><code class="docutils literal notranslate"><span class="pre">plot_evolution_error()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="torchnldm.utils.html#module-torchnldm.utils">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+<section id="module-torchnldm">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-torchnldm" title="Permalink to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Nicola Farenga.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
