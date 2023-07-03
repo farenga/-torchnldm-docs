@@ -6,8 +6,6 @@
 TorchNLDM Documentation
 =====================================
 
-Installation infos can be found at the
-
 Using TorchNLDM
 ----------------
 
@@ -22,19 +20,19 @@ TorchNLDM Modules
 -----------------
 
 :doc:`torchnldm.data`
-    How to use the library.
+    Module performing data handling and preprocessing. It provides the ``DataLoader`` class, which facilitates dataset loading with methods dedicated to batches and trajectories sampling. Additionally, the ``DataScaler`` class is available for performing normalization and feature scaling tasks.
 
 :doc:`torchnldm.model`
-    How to use the library.
+    Module including the ``NLDMBase`` class, serving as a base class for  ``NLDM`` and ``NLDF`` implementations. It also includes components related to autoencoders and neural differential equations.
 
 :doc:`torchnldm.train`
-    How to use the library.
+    Module containing the ``Trainer`` class, handling the models' training routine.
 
 :doc:`torchnldm.evaluate`
-    How to use the library.
+    Module containing the ``Evaluator`` class, handling the models' evaluation routine.
 
 :doc:`torchnldm.utils`
-    How to use the library.
+    Module consisting of several submodules serving different purposes. It includes utilities for error metrics calculation, pre-implemented neural networks modules used as the building blocks of the main models' components, and plot utilities for visualizing results and performances.
 
 .. toctree::
    :caption: Get started
