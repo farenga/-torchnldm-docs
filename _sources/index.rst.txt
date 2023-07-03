@@ -3,12 +3,51 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-TorchNLDM documentation
+TorchNLDM Documentation
 =====================================
 
+Installation infos can be found at the
+
+Using TorchNLDM
+----------------
+
+:doc:`installation`
+    How to install the library.
+
+:doc:`usage`
+    How to use the library.
+
+
+TorchNLDM Modules
+-----------------
+
+:doc:`torchnldm.data`
+    How to use the library.
+
+:doc:`torchnldm.model`
+    How to use the library.
+
+:doc:`torchnldm.train`
+    How to use the library.
+
+:doc:`torchnldm.evaluate`
+    How to use the library.
+
+:doc:`torchnldm.utils`
+    How to use the library.
+
 .. toctree::
+   :caption: Get started
    :maxdepth: 2
-   :caption: Contents:
+   :hidden:
+
+   installation
+   usage
+
+.. toctree::
+   :caption: Modules
+   :maxdepth: 2
+   :hidden:
 
    torchnldm.data
    torchnldm.model

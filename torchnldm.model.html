@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>torchnldm.model package &mdash; TorchNLDM 0.1 documentation</title>
+  <title>torchnldm.model &mdash; TorchNLDM 0.1 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -17,8 +17,8 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="torchnldm.train package" href="torchnldm.train.html" />
-    <link rel="prev" title="torchnldm.data package" href="torchnldm.data.html" /> 
+    <link rel="next" title="torchnldm.train" href="torchnldm.train.html" />
+    <link rel="prev" title="torchnldm.data" href="torchnldm.data.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -40,12 +40,16 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Get started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Modules</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="torchnldm.data.html">torchnldm.data package</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">torchnldm.model package</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#module-torchnldm.model.ae">torchnldm.model.ae module</a><ul>
+<li class="toctree-l1"><a class="reference internal" href="torchnldm.data.html">torchnldm.data</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">torchnldm.model</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#module-torchnldm.model.ae">torchnldm.model.ae</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#torchnldm.model.ae.FieldDecoder"><code class="docutils literal notranslate"><span class="pre">FieldDecoder</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#torchnldm.model.ae.FieldDecoder.forward"><code class="docutils literal notranslate"><span class="pre">FieldDecoder.forward()</span></code></a></li>
 </ul>
@@ -64,7 +68,7 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#module-torchnldm.model.nde">torchnldm.model.nde module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#module-torchnldm.model.nde">torchnldm.model.nde</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#torchnldm.model.nde.NeuralDE"><code class="docutils literal notranslate"><span class="pre">NeuralDE</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#torchnldm.model.nde.NeuralDE.forward"><code class="docutils literal notranslate"><span class="pre">NeuralDE.forward()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#torchnldm.model.nde.NeuralDE.wrap_nvf"><code class="docutils literal notranslate"><span class="pre">NeuralDE.wrap_nvf()</span></code></a></li>
@@ -84,7 +88,7 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#module-torchnldm.model.nldm">torchnldm.model.nldm module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#module-torchnldm.model.nldm">torchnldm.model.nldm</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#torchnldm.model.nldm.NLDF"><code class="docutils literal notranslate"><span class="pre">NLDF</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#torchnldm.model.nldm.NLDF.forward"><code class="docutils literal notranslate"><span class="pre">NLDF.forward()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#torchnldm.model.nldm.NLDF.get_batch_loss"><code class="docutils literal notranslate"><span class="pre">NLDF.get_batch_loss()</span></code></a></li>
@@ -180,12 +184,11 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#module-torchnldm.model">Module contents</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="torchnldm.train.html">torchnldm.train package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="torchnldm.evaluate.html">torchnldm.evaluate package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="torchnldm.utils.html">torchnldm.utils package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torchnldm.train.html">torchnldm.train</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torchnldm.evaluate.html">torchnldm.evaluate</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torchnldm.utils.html">torchnldm.utils</a></li>
 </ul>
 
         </div>
@@ -202,7 +205,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">torchnldm.model package</li>
+      <li class="breadcrumb-item active">torchnldm.model</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/torchnldm.model.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -212,13 +215,10 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="torchnldm-model-package">
-<h1>torchnldm.model package<a class="headerlink" href="#torchnldm-model-package" title="Permalink to this heading"></a></h1>
-<section id="submodules">
-<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading"></a></h2>
-</section>
+  <section id="torchnldm-model">
+<h1>torchnldm.model<a class="headerlink" href="#torchnldm-model" title="Permalink to this heading"></a></h1>
 <section id="module-torchnldm.model.ae">
-<span id="torchnldm-model-ae-module"></span><h2>torchnldm.model.ae module<a class="headerlink" href="#module-torchnldm.model.ae" title="Permalink to this heading"></a></h2>
+<span id="torchnldm-model-ae"></span><h2>torchnldm.model.ae<a class="headerlink" href="#module-torchnldm.model.ae" title="Permalink to this heading"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="torchnldm.model.ae.FieldDecoder">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">torchnldm.model.ae.</span></span><span class="sig-name descname"><span class="pre">FieldDecoder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">latent_dim</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hidden_dim</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">64</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">activation</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'elu'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">architecture</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'hidden_sum'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchnldm/model/ae.html#FieldDecoder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchnldm.model.ae.FieldDecoder" title="Permalink to this definition"></a></dt>
@@ -446,7 +446,7 @@ For the parameterized version consider using the PStateEncoder class.</p>
 
 </section>
 <section id="module-torchnldm.model.nde">
-<span id="torchnldm-model-nde-module"></span><h2>torchnldm.model.nde module<a class="headerlink" href="#module-torchnldm.model.nde" title="Permalink to this heading"></a></h2>
+<span id="torchnldm-model-nde"></span><h2>torchnldm.model.nde<a class="headerlink" href="#module-torchnldm.model.nde" title="Permalink to this heading"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="torchnldm.model.nde.NeuralDE">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">torchnldm.model.nde.</span></span><span class="sig-name descname"><span class="pre">NeuralDE</span></span><a class="reference internal" href="_modules/torchnldm/model/nde.html#NeuralDE"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchnldm.model.nde.NeuralDE" title="Permalink to this definition"></a></dt>
@@ -598,7 +598,7 @@ registered hooks while the latter silently ignores them.</p>
 
 </section>
 <section id="module-torchnldm.model.nldm">
-<span id="torchnldm-model-nldm-module"></span><h2>torchnldm.model.nldm module<a class="headerlink" href="#module-torchnldm.model.nldm" title="Permalink to this heading"></a></h2>
+<span id="torchnldm-model-nldm"></span><h2>torchnldm.model.nldm<a class="headerlink" href="#module-torchnldm.model.nldm" title="Permalink to this heading"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="torchnldm.model.nldm.NLDF">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">torchnldm.model.nldm.</span></span><span class="sig-name descname"><span class="pre">NLDF</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#torchnldm.model.nldm.NLDFConfig" title="torchnldm.model.nldm.NLDFConfig"><span class="pre">NLDFConfig</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchnldm/model/nldm.html#NLDF"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchnldm.model.nldm.NLDF" title="Permalink to this definition"></a></dt>
@@ -1305,17 +1305,14 @@ the specific NLDM behavior, which need to be implemented in the child classes, i
 </dd></dl>
 
 </section>
-<section id="module-torchnldm.model">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-torchnldm.model" title="Permalink to this heading"></a></h2>
-</section>
 </section>
 
 
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="torchnldm.data.html" class="btn btn-neutral float-left" title="torchnldm.data package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="torchnldm.train.html" class="btn btn-neutral float-right" title="torchnldm.train package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="torchnldm.data.html" class="btn btn-neutral float-left" title="torchnldm.data" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="torchnldm.train.html" class="btn btn-neutral float-right" title="torchnldm.train" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

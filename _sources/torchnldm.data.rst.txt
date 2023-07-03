@@ -1,10 +1,7 @@
-torchnldm.data package
-======================
+torchnldm.data
+==============
 
-Submodules
-----------
-
-torchnldm.data.dataloader module
+torchnldm.data.dataloader 
 --------------------------------
 
 .. automodule:: torchnldm.data.dataloader
@@ -12,18 +9,10 @@ torchnldm.data.dataloader module
    :undoc-members:
    :show-inheritance:
 
-torchnldm.data.datascaler module
+torchnldm.data.datascaler 
 --------------------------------
 
 .. automodule:: torchnldm.data.datascaler
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-Module contents
----------------
-
-.. automodule:: torchnldm.data
    :members:
    :undoc-members:
    :show-inheritance:

@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>torchnldm.evaluate package &mdash; TorchNLDM 0.1 documentation</title>
+  <title>torchnldm.evaluate &mdash; TorchNLDM 0.1 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -17,8 +17,8 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="torchnldm.utils package" href="torchnldm.utils.html" />
-    <link rel="prev" title="torchnldm.train package" href="torchnldm.train.html" /> 
+    <link rel="next" title="torchnldm.utils" href="torchnldm.utils.html" />
+    <link rel="prev" title="torchnldm.train" href="torchnldm.train.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -40,14 +40,18 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Get started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Modules</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="torchnldm.data.html">torchnldm.data package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="torchnldm.model.html">torchnldm.model package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="torchnldm.train.html">torchnldm.train package</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">torchnldm.evaluate package</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#module-torchnldm.evaluate.evaluator">torchnldm.evaluate.evaluator module</a><ul>
+<li class="toctree-l1"><a class="reference internal" href="torchnldm.data.html">torchnldm.data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torchnldm.model.html">torchnldm.model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torchnldm.train.html">torchnldm.train</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">torchnldm.evaluate</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#module-torchnldm.evaluate.evaluator">torchnldm.evaluate.evaluator</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#torchnldm.evaluate.evaluator.Evaluator"><code class="docutils literal notranslate"><span class="pre">Evaluator</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#torchnldm.evaluate.evaluator.Evaluator.eval"><code class="docutils literal notranslate"><span class="pre">Evaluator.eval()</span></code></a></li>
 </ul>
@@ -67,10 +71,9 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#module-torchnldm.evaluate">Module contents</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="torchnldm.utils.html">torchnldm.utils package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torchnldm.utils.html">torchnldm.utils</a></li>
 </ul>
 
         </div>
@@ -87,7 +90,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">torchnldm.evaluate package</li>
+      <li class="breadcrumb-item active">torchnldm.evaluate</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/torchnldm.evaluate.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -97,13 +100,10 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="torchnldm-evaluate-package">
-<h1>torchnldm.evaluate package<a class="headerlink" href="#torchnldm-evaluate-package" title="Permalink to this heading"></a></h1>
-<section id="submodules">
-<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading"></a></h2>
-</section>
+  <section id="torchnldm-evaluate">
+<h1>torchnldm.evaluate<a class="headerlink" href="#torchnldm-evaluate" title="Permalink to this heading"></a></h1>
 <section id="module-torchnldm.evaluate.evaluator">
-<span id="torchnldm-evaluate-evaluator-module"></span><h2>torchnldm.evaluate.evaluator module<a class="headerlink" href="#module-torchnldm.evaluate.evaluator" title="Permalink to this heading"></a></h2>
+<span id="torchnldm-evaluate-evaluator"></span><h2>torchnldm.evaluate.evaluator<a class="headerlink" href="#module-torchnldm.evaluate.evaluator" title="Permalink to this heading"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="torchnldm.evaluate.evaluator.Evaluator">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">torchnldm.evaluate.evaluator.</span></span><span class="sig-name descname"><span class="pre">Evaluator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="torchnldm.model.html#torchnldm.model.nldm.NLDM" title="torchnldm.model.nldm.NLDM"><span class="pre">NLDM</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="torchnldm.data.html#torchnldm.data.dataloader.DataLoader" title="torchnldm.data.dataloader.DataLoader"><span class="pre">DataLoader</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#torchnldm.evaluate.evaluator.EvaluatorConfig" title="torchnldm.evaluate.evaluator.EvaluatorConfig"><span class="pre">EvaluatorConfig</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchnldm/evaluate/evaluator.html#Evaluator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchnldm.evaluate.evaluator.Evaluator" title="Permalink to this definition"></a></dt>
@@ -201,17 +201,14 @@ metrics_filename (str): metrics filename.</p>
 </dd></dl>
 
 </section>
-<section id="module-torchnldm.evaluate">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-torchnldm.evaluate" title="Permalink to this heading"></a></h2>
-</section>
 </section>
 
 
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="torchnldm.train.html" class="btn btn-neutral float-left" title="torchnldm.train package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="torchnldm.utils.html" class="btn btn-neutral float-right" title="torchnldm.utils package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="torchnldm.train.html" class="btn btn-neutral float-left" title="torchnldm.train" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="torchnldm.utils.html" class="btn btn-neutral float-right" title="torchnldm.utils" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

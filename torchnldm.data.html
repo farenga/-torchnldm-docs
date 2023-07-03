@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>torchnldm.data package &mdash; TorchNLDM 0.1 documentation</title>
+  <title>torchnldm.data &mdash; TorchNLDM 0.1 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -17,8 +17,8 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="torchnldm.model package" href="torchnldm.model.html" />
-    <link rel="prev" title="TorchNLDM documentation" href="index.html" /> 
+    <link rel="next" title="torchnldm.model" href="torchnldm.model.html" />
+    <link rel="prev" title="Usage" href="usage.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -40,11 +40,15 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Get started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Modules</span></p>
 <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">torchnldm.data package</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#module-torchnldm.data.dataloader">torchnldm.data.dataloader module</a><ul>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">torchnldm.data</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#module-torchnldm.data.dataloader">torchnldm.data.dataloader</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#torchnldm.data.dataloader.DataLoader"><code class="docutils literal notranslate"><span class="pre">DataLoader</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#torchnldm.data.dataloader.DataLoader.get_batch"><code class="docutils literal notranslate"><span class="pre">DataLoader.get_batch()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#torchnldm.data.dataloader.DataLoader.get_sample"><code class="docutils literal notranslate"><span class="pre">DataLoader.get_sample()</span></code></a></li>
@@ -67,7 +71,7 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#module-torchnldm.data.datascaler">torchnldm.data.datascaler module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#module-torchnldm.data.datascaler">torchnldm.data.datascaler</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#torchnldm.data.datascaler.DataScaler"><code class="docutils literal notranslate"><span class="pre">DataScaler</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#torchnldm.data.datascaler.DataScaler.scale_dataset"><code class="docutils literal notranslate"><span class="pre">DataScaler.scale_dataset()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#torchnldm.data.datascaler.DataScaler.scale_feature"><code class="docutils literal notranslate"><span class="pre">DataScaler.scale_feature()</span></code></a></li>
@@ -75,13 +79,12 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#module-torchnldm.data">Module contents</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="torchnldm.model.html">torchnldm.model package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="torchnldm.train.html">torchnldm.train package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="torchnldm.evaluate.html">torchnldm.evaluate package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="torchnldm.utils.html">torchnldm.utils package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torchnldm.model.html">torchnldm.model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torchnldm.train.html">torchnldm.train</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torchnldm.evaluate.html">torchnldm.evaluate</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torchnldm.utils.html">torchnldm.utils</a></li>
 </ul>
 
         </div>
@@ -98,7 +101,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">torchnldm.data package</li>
+      <li class="breadcrumb-item active">torchnldm.data</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/torchnldm.data.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -108,13 +111,10 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="torchnldm-data-package">
-<h1>torchnldm.data package<a class="headerlink" href="#torchnldm-data-package" title="Permalink to this heading"></a></h1>
-<section id="submodules">
-<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading"></a></h2>
-</section>
+  <section id="torchnldm-data">
+<h1>torchnldm.data<a class="headerlink" href="#torchnldm-data" title="Permalink to this heading"></a></h1>
 <section id="module-torchnldm.data.dataloader">
-<span id="torchnldm-data-dataloader-module"></span><h2>torchnldm.data.dataloader module<a class="headerlink" href="#module-torchnldm.data.dataloader" title="Permalink to this heading"></a></h2>
+<span id="torchnldm-data-dataloader"></span><h2>torchnldm.data.dataloader<a class="headerlink" href="#module-torchnldm.data.dataloader" title="Permalink to this heading"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="torchnldm.data.dataloader.DataLoader">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">torchnldm.data.dataloader.</span></span><span class="sig-name descname"><span class="pre">DataLoader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#torchnldm.data.dataloader.DataLoaderConfig" title="torchnldm.data.dataloader.DataLoaderConfig"><span class="pre">DataLoaderConfig</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchnldm/data/dataloader.html#DataLoader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchnldm.data.dataloader.DataLoader" title="Permalink to this definition"></a></dt>
@@ -337,7 +337,7 @@ of shape (batch_size_nodes,n) instead than Nh.</p>
 
 </section>
 <section id="module-torchnldm.data.datascaler">
-<span id="torchnldm-data-datascaler-module"></span><h2>torchnldm.data.datascaler module<a class="headerlink" href="#module-torchnldm.data.datascaler" title="Permalink to this heading"></a></h2>
+<span id="torchnldm-data-datascaler"></span><h2>torchnldm.data.datascaler<a class="headerlink" href="#module-torchnldm.data.datascaler" title="Permalink to this heading"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="torchnldm.data.datascaler.DataScaler">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">torchnldm.data.datascaler.</span></span><span class="sig-name descname"><span class="pre">DataScaler</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scaler_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#torchnldm.data.dataloader.DataLoader" title="torchnldm.data.dataloader.DataLoader"><span class="pre">DataLoader</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchnldm/data/datascaler.html#DataScaler"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchnldm.data.datascaler.DataScaler" title="Permalink to this definition"></a></dt>
@@ -378,17 +378,14 @@ of shape (batch_size_nodes,n) instead than Nh.</p>
 </dd></dl>
 
 </section>
-<section id="module-torchnldm.data">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-torchnldm.data" title="Permalink to this heading"></a></h2>
-</section>
 </section>
 
 
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="index.html" class="btn btn-neutral float-left" title="TorchNLDM documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="torchnldm.model.html" class="btn btn-neutral float-right" title="torchnldm.model package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="usage.html" class="btn btn-neutral float-left" title="Usage" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="torchnldm.model.html" class="btn btn-neutral float-right" title="torchnldm.model" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

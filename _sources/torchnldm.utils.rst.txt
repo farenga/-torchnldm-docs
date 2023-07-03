@@ -1,18 +1,7 @@
-torchnldm.utils package
-=======================
+torchnldm.utils
+===============
 
-Submodules
-----------
-
-torchnldm.utils.addtypes module
--------------------------------
-
-.. automodule:: torchnldm.utils.addtypes
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-torchnldm.utils.config module
+torchnldm.utils.config 
 -----------------------------
 
 .. automodule:: torchnldm.utils.config
@@ -20,7 +9,7 @@ torchnldm.utils.config module
    :undoc-members:
    :show-inheritance:
 
-torchnldm.utils.metrics module
+torchnldm.utils.metrics 
 ------------------------------
 
 .. automodule:: torchnldm.utils.metrics
@@ -28,7 +17,7 @@ torchnldm.utils.metrics module
    :undoc-members:
    :show-inheritance:
 
-torchnldm.utils.model module
+torchnldm.utils.model 
 ----------------------------
 
 .. automodule:: torchnldm.utils.model
@@ -36,7 +25,7 @@ torchnldm.utils.model module
    :undoc-members:
    :show-inheritance:
 
-torchnldm.utils.nn module
+torchnldm.utils.nn 
 -------------------------
 
 .. automodule:: torchnldm.utils.nn
@@ -44,7 +33,7 @@ torchnldm.utils.nn module
    :undoc-members:
    :show-inheritance:
 
-torchnldm.utils.ops module
+torchnldm.utils.ops 
 --------------------------
 
 .. automodule:: torchnldm.utils.ops
@@ -52,18 +41,10 @@ torchnldm.utils.ops module
    :undoc-members:
    :show-inheritance:
 
-torchnldm.utils.plot module
+torchnldm.utils.plot 
 ---------------------------
 
 .. automodule:: torchnldm.utils.plot
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-Module contents
----------------
-
-.. automodule:: torchnldm.utils
    :members:
    :undoc-members:
    :show-inheritance:

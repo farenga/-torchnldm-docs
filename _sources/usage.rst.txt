@@ -1,0 +1,51 @@
+Usage
+============
+
+Typical usage
+----------------
+
+The library usage revolves around the typical Machine Learning workflow, composed of four main stages:
+
+    - Data loading and preprocessing
+    - Model definition and instantiation
+    - Model training
+    - Model evaluation
+
+For each of the ML workflow stages the library features a dedicated module, so that the library usage can be 
+splitted into four main steps, as follows:
+
+.. code:: python
+
+    from torchnldm.data import DataLoader, DataLoaderConfig
+    from torchnldm.model import NLDM, NLDMConfig
+    from torchnldm.train import Trainer, TrainerConfig
+    from torchnldm.evaluate import Evaluator, EvaluatorConfig
+
+    # Loading of train and test datasets
+    train_dataset_config = DataLoaderConfig(...)
+    test_dataset_config = DataLoaderConfig(...)
+    train_dataset = DataLoader(train_dataset_config)
+    test_dataset = DataLoader(test_dataset_config)
+
+    # NLDM instantiation
+    model_config = NLDMConfig(...)
+    model = NLDM(model_config)
+    model.load_scaler_from_dataset(train_dataset)
+
+    # Trainer instantiation
+    train_config = TrainerConfig(...)
+    trainer = Trainer(model, train_dataset, train_config)
+    trainer.train() # start training routine
+
+    # Evaluator instantiation
+    eval_config = EvaluatorConfig(...)
+    evaluator = Evaluator(model,test_dataset,eval_config)
+    evaluator.eval() # start evaluation routine
+
+
+Examples
+----------------
+
+Usage examples can be found within the repository `experiments <https://github.com/farenga/torchnldm/tree/main/experiments>`_ folder, 
+containing numerical experiments in the Jupyter notebooks ``.ipynb``  format, concerning the application of NLDMs to 
+time-continuous reduced order modeling for spatially-discretized PDEs.

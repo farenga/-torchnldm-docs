@@ -1,21 +1,10 @@
-torchnldm.evaluate package
-==========================
+torchnldm.evaluate
+==================
 
-Submodules
-----------
-
-torchnldm.evaluate.evaluator module
+torchnldm.evaluate.evaluator 
 -----------------------------------
 
 .. automodule:: torchnldm.evaluate.evaluator
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-Module contents
----------------
-
-.. automodule:: torchnldm.evaluate
    :members:
    :undoc-members:
    :show-inheritance:

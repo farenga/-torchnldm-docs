@@ -1,8 +1,5 @@
-torchnldm package
+torchnldm
 =================
-
-Subpackages
------------
 
 .. toctree::
    :maxdepth: 4
@@ -12,11 +9,3 @@ Subpackages
    torchnldm.model
    torchnldm.train
    torchnldm.utils
-
-Module contents
----------------
-
-.. automodule:: torchnldm
-   :members:
-   :undoc-members:
-   :show-inheritance:

@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>torchnldm.utils package &mdash; TorchNLDM 0.1 documentation</title>
+  <title>torchnldm.utils &mdash; TorchNLDM 0.1 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -17,7 +17,7 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="prev" title="torchnldm.evaluate package" href="torchnldm.evaluate.html" /> 
+    <link rel="prev" title="torchnldm.evaluate" href="torchnldm.evaluate.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -39,16 +39,19 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Get started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Modules</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="torchnldm.data.html">torchnldm.data package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="torchnldm.model.html">torchnldm.model package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="torchnldm.train.html">torchnldm.train package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="torchnldm.evaluate.html">torchnldm.evaluate package</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">torchnldm.utils package</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#module-torchnldm.utils.addtypes">torchnldm.utils.addtypes module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#module-torchnldm.utils.config">torchnldm.utils.config module</a><ul>
+<li class="toctree-l1"><a class="reference internal" href="torchnldm.data.html">torchnldm.data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torchnldm.model.html">torchnldm.model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torchnldm.train.html">torchnldm.train</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torchnldm.evaluate.html">torchnldm.evaluate</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">torchnldm.utils</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#module-torchnldm.utils.config">torchnldm.utils.config</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#torchnldm.utils.config.ConfigBase"><code class="docutils literal notranslate"><span class="pre">ConfigBase</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#torchnldm.utils.config.ConfigBase.save"><code class="docutils literal notranslate"><span class="pre">ConfigBase.save()</span></code></a></li>
 </ul>
@@ -59,7 +62,7 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#module-torchnldm.utils.metrics">torchnldm.utils.metrics module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#module-torchnldm.utils.metrics">torchnldm.utils.metrics</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#torchnldm.utils.metrics.MetricsLogger"><code class="docutils literal notranslate"><span class="pre">MetricsLogger</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#torchnldm.utils.metrics.MetricsLogger.print_current"><code class="docutils literal notranslate"><span class="pre">MetricsLogger.print_current()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#torchnldm.utils.metrics.MetricsLogger.save"><code class="docutils literal notranslate"><span class="pre">MetricsLogger.save()</span></code></a></li>
@@ -73,13 +76,13 @@
 <li class="toctree-l3"><a class="reference internal" href="#torchnldm.utils.metrics.relative_error_vectorized"><code class="docutils literal notranslate"><span class="pre">relative_error_vectorized()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#module-torchnldm.utils.model">torchnldm.utils.model module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#module-torchnldm.utils.model">torchnldm.utils.model</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#torchnldm.utils.model.get_layers_sizes"><code class="docutils literal notranslate"><span class="pre">get_layers_sizes()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#torchnldm.utils.model.get_model_params"><code class="docutils literal notranslate"><span class="pre">get_model_params()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#torchnldm.utils.model.model_summary"><code class="docutils literal notranslate"><span class="pre">model_summary()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#module-torchnldm.utils.nn">torchnldm.utils.nn module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#module-torchnldm.utils.nn">torchnldm.utils.nn</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#torchnldm.utils.nn.Activation"><code class="docutils literal notranslate"><span class="pre">Activation</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#torchnldm.utils.nn.Activation.forward"><code class="docutils literal notranslate"><span class="pre">Activation.forward()</span></code></a></li>
 </ul>
@@ -150,7 +153,7 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#module-torchnldm.utils.ops">torchnldm.utils.ops module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#module-torchnldm.utils.ops">torchnldm.utils.ops</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#torchnldm.utils.ops.POD"><code class="docutils literal notranslate"><span class="pre">POD()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#torchnldm.utils.ops.delete_tensor"><code class="docutils literal notranslate"><span class="pre">delete_tensor()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#torchnldm.utils.ops.get_meanstd"><code class="docutils literal notranslate"><span class="pre">get_meanstd()</span></code></a></li>
@@ -162,7 +165,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#torchnldm.utils.ops.timing"><code class="docutils literal notranslate"><span class="pre">timing()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#module-torchnldm.utils.plot">torchnldm.utils.plot module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#module-torchnldm.utils.plot">torchnldm.utils.plot</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#torchnldm.utils.plot.get_gridpoints_2d"><code class="docutils literal notranslate"><span class="pre">get_gridpoints_2d()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#torchnldm.utils.plot.plot1"><code class="docutils literal notranslate"><span class="pre">plot1()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#torchnldm.utils.plot.plot3"><code class="docutils literal notranslate"><span class="pre">plot3()</span></code></a></li>
@@ -170,7 +173,6 @@
 <li class="toctree-l3"><a class="reference internal" href="#torchnldm.utils.plot.plot_evolution_error"><code class="docutils literal notranslate"><span class="pre">plot_evolution_error()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#module-torchnldm.utils">Module contents</a></li>
 </ul>
 </li>
 </ul>
@@ -189,7 +191,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">torchnldm.utils package</li>
+      <li class="breadcrumb-item active">torchnldm.utils</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/torchnldm.utils.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -199,16 +201,10 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="torchnldm-utils-package">
-<h1>torchnldm.utils package<a class="headerlink" href="#torchnldm-utils-package" title="Permalink to this heading"></a></h1>
-<section id="submodules">
-<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading"></a></h2>
-</section>
-<section id="module-torchnldm.utils.addtypes">
-<span id="torchnldm-utils-addtypes-module"></span><h2>torchnldm.utils.addtypes module<a class="headerlink" href="#module-torchnldm.utils.addtypes" title="Permalink to this heading"></a></h2>
-</section>
+  <section id="torchnldm-utils">
+<h1>torchnldm.utils<a class="headerlink" href="#torchnldm-utils" title="Permalink to this heading"></a></h1>
 <section id="module-torchnldm.utils.config">
-<span id="torchnldm-utils-config-module"></span><h2>torchnldm.utils.config module<a class="headerlink" href="#module-torchnldm.utils.config" title="Permalink to this heading"></a></h2>
+<span id="torchnldm-utils-config"></span><h2>torchnldm.utils.config<a class="headerlink" href="#module-torchnldm.utils.config" title="Permalink to this heading"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="torchnldm.utils.config.ConfigBase">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">torchnldm.utils.config.</span></span><span class="sig-name descname"><span class="pre">ConfigBase</span></span><a class="reference internal" href="_modules/torchnldm/utils/config.html#ConfigBase"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchnldm.utils.config.ConfigBase" title="Permalink to this definition"></a></dt>
@@ -251,7 +247,7 @@ implement default like this:</p>
 
 </section>
 <section id="module-torchnldm.utils.metrics">
-<span id="torchnldm-utils-metrics-module"></span><h2>torchnldm.utils.metrics module<a class="headerlink" href="#module-torchnldm.utils.metrics" title="Permalink to this heading"></a></h2>
+<span id="torchnldm-utils-metrics"></span><h2>torchnldm.utils.metrics<a class="headerlink" href="#module-torchnldm.utils.metrics" title="Permalink to this heading"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="torchnldm.utils.metrics.MetricsLogger">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">torchnldm.utils.metrics.</span></span><span class="sig-name descname"><span class="pre">MetricsLogger</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">metrics_keys</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchnldm/utils/metrics.html#MetricsLogger"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchnldm.utils.metrics.MetricsLogger" title="Permalink to this definition"></a></dt>
@@ -300,7 +296,7 @@ implement default like this:</p>
 
 </section>
 <section id="module-torchnldm.utils.model">
-<span id="torchnldm-utils-model-module"></span><h2>torchnldm.utils.model module<a class="headerlink" href="#module-torchnldm.utils.model" title="Permalink to this heading"></a></h2>
+<span id="torchnldm-utils-model"></span><h2>torchnldm.utils.model<a class="headerlink" href="#module-torchnldm.utils.model" title="Permalink to this heading"></a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="torchnldm.utils.model.get_layers_sizes">
 <span class="sig-prename descclassname"><span class="pre">torchnldm.utils.model.</span></span><span class="sig-name descname"><span class="pre">get_layers_sizes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Module</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hidden</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchnldm/utils/model.html#get_layers_sizes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchnldm.utils.model.get_layers_sizes" title="Permalink to this definition"></a></dt>
@@ -318,11 +314,21 @@ implement default like this:</p>
 
 </section>
 <section id="module-torchnldm.utils.nn">
-<span id="torchnldm-utils-nn-module"></span><h2>torchnldm.utils.nn module<a class="headerlink" href="#module-torchnldm.utils.nn" title="Permalink to this heading"></a></h2>
+<span id="torchnldm-utils-nn"></span><h2>torchnldm.utils.nn<a class="headerlink" href="#module-torchnldm.utils.nn" title="Permalink to this heading"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="torchnldm.utils.nn.Activation">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">torchnldm.utils.nn.</span></span><span class="sig-name descname"><span class="pre">Activation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">activation_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'elu'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchnldm/utils/nn.html#Activation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchnldm.utils.nn.Activation" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code></p>
+<p>Activation function class. It handles the different activations available in _act_dict, namely:
+(silu, gelu, elu, relu, tanh, softsign, sigmoid, sine).</p>
+<dl class="simple">
+<dt>Args:</dt><dd><dl class="field-list simple">
+<dt class="field-odd">activation_id<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(str), identifier of the activation.</p>
+</dd>
+</dl>
+</dd>
+</dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="torchnldm.utils.nn.Activation.forward">
 <span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tensor</span></span></span><a class="reference internal" href="_modules/torchnldm/utils/nn.html#Activation.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchnldm.utils.nn.Activation.forward" title="Permalink to this definition"></a></dt>
@@ -481,11 +487,15 @@ registered hooks while the latter silently ignores them.</p>
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">torchnldm.utils.nn.</span></span><span class="sig-name descname"><span class="pre">HiddenOpNet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_dim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cond_input_dim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_dim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hidden_dim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depth</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">activation</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'elu'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">positional_encoding</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">architecture</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'hidden_sum'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchnldm/utils/nn.html#HiddenOpNet"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchnldm.utils.nn.HiddenOpNet" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code></p>
 <p>Templated class for Hidden Operations Network, with Positional Encoding.
-It performs conditioning via: 
-- hidden sums
-- hidden hadamard products
-- residual hadamard products 
-between hidden states and the embedding of the conditioning variable.</p>
+It performs conditioning via:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>hidden sums</p></li>
+<li><p>hidden hadamard products</p></li>
+<li><p>residual hadamard products</p></li>
+</ul>
+</div></blockquote>
+<p>between hidden states and the embedding of the conditioning variable.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="torchnldm.utils.nn.HiddenOpNet.forward">
 <span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tensor</span></span></span><a class="reference internal" href="_modules/torchnldm/utils/nn.html#HiddenOpNet.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchnldm.utils.nn.HiddenOpNet.forward" title="Permalink to this definition"></a></dt>
@@ -572,14 +582,47 @@ registered hooks while the latter silently ignores them.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="torchnldm.utils.nn.MLP">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">torchnldm.utils.nn.</span></span><span class="sig-name descname"><span class="pre">MLP</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">layers_dims</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">activation</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'elu'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchnldm/utils/nn.html#MLP"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchnldm.utils.nn.MLP" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">torchnldm.utils.nn.</span></span><span class="sig-name descname"><span class="pre">MLP</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">layers_dims</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">activation</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'elu'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchnldm/utils/nn.html#MLP"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchnldm.utils.nn.MLP" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code></p>
 <p>Multi-Layer Perceptron.
-Can be instantiated in two different ways:
-1. By providing a list of int specifying the layers dimensions as [input_dim, hidden_dim_1, …, hidden_dim_n, output_dim], 
-and a string specifying the activation function.
-2. If the hidden layers all have the same dimension, then it is enough to pass input_dim, output_dim, hidden_dim, depth,
+Can be instantiated in two different ways:</p>
+<p>By providing a list of int specifying the layers dimensions as [input_dim, hidden_dim_1, …, hidden_dim_n, output_dim], 
+and a string specifying the activation function.</p>
+<dl class="simple">
+<dt>Args: </dt><dd><dl class="field-list simple">
+<dt class="field-odd">layers_dims<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(list[int]), list of the different dimensions of each layer</p>
+</dd>
+<dt class="field-even">activation<span class="colon">:</span></dt>
+<dd class="field-even"><p>(str), activation function identifier</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p>If the hidden layers all have the same dimension, then it is enough to pass input_dim, output_dim, hidden_dim, depth,
 where depth defines the number of hidden layers, so depth = 1 leads to a 3 layer network.</p>
+<blockquote>
+<div><dl class="simple">
+<dt>Args: </dt><dd><dl class="field-list simple">
+<dt class="field-odd">input_dim<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(int), dimension of the input layer</p>
+</dd>
+<dt class="field-even">output_dim<span class="colon">:</span></dt>
+<dd class="field-even"><p>(int), dimension of the output layer</p>
+</dd>
+<dt class="field-odd">hidden_dim<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(int), dimension of the hidden layers</p>
+</dd>
+<dt class="field-even">depth<span class="colon">:</span></dt>
+<dd class="field-even"><p>(int), number of hidden layers</p>
+</dd>
+<dt class="field-odd">activation<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(str), activation function identifier</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</div></blockquote>
 <dl class="py method">
 <dt class="sig sig-object py" id="torchnldm.utils.nn.MLP.build_mlp">
 <span class="sig-name descname"><span class="pre">build_mlp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">layers_dims</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Sequential</span></span></span><a class="reference internal" href="_modules/torchnldm/utils/nn.html#MLP.build_mlp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchnldm.utils.nn.MLP.build_mlp" title="Permalink to this definition"></a></dt>
@@ -704,7 +747,7 @@ registered hooks while the latter silently ignores them.</p>
 
 </section>
 <section id="module-torchnldm.utils.ops">
-<span id="torchnldm-utils-ops-module"></span><h2>torchnldm.utils.ops module<a class="headerlink" href="#module-torchnldm.utils.ops" title="Permalink to this heading"></a></h2>
+<span id="torchnldm-utils-ops"></span><h2>torchnldm.utils.ops<a class="headerlink" href="#module-torchnldm.utils.ops" title="Permalink to this heading"></a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="torchnldm.utils.ops.POD">
 <span class="sig-prename descclassname"><span class="pre">torchnldm.utils.ops.</span></span><span class="sig-name descname"><span class="pre">POD</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">S</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">torch.Tensor</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/torchnldm/utils/ops.html#POD"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchnldm.utils.ops.POD" title="Permalink to this definition"></a></dt>
@@ -752,7 +795,7 @@ registered hooks while the latter silently ignores them.</p>
 
 </section>
 <section id="module-torchnldm.utils.plot">
-<span id="torchnldm-utils-plot-module"></span><h2>torchnldm.utils.plot module<a class="headerlink" href="#module-torchnldm.utils.plot" title="Permalink to this heading"></a></h2>
+<span id="torchnldm-utils-plot"></span><h2>torchnldm.utils.plot<a class="headerlink" href="#module-torchnldm.utils.plot" title="Permalink to this heading"></a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="torchnldm.utils.plot.get_gridpoints_2d">
 <span class="sig-prename descclassname"><span class="pre">torchnldm.utils.plot.</span></span><span class="sig-name descname"><span class="pre">get_gridpoints_2d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">coords</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchnldm/utils/plot.html#get_gridpoints_2d"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchnldm.utils.plot.get_gridpoints_2d" title="Permalink to this definition"></a></dt>
@@ -779,16 +822,13 @@ registered hooks while the latter silently ignores them.</p>
 <dd></dd></dl>
 
 </section>
-<section id="module-torchnldm.utils">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-torchnldm.utils" title="Permalink to this heading"></a></h2>
-</section>
 </section>
 
 
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="torchnldm.evaluate.html" class="btn btn-neutral float-left" title="torchnldm.evaluate package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="torchnldm.evaluate.html" class="btn btn-neutral float-left" title="torchnldm.evaluate" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
 
   <hr/>

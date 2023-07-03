@@ -1,10 +1,7 @@
-torchnldm.model package
-=======================
+torchnldm.model
+===============
 
-Submodules
-----------
-
-torchnldm.model.ae module
+torchnldm.model.ae 
 -------------------------
 
 .. automodule:: torchnldm.model.ae
@@ -12,7 +9,7 @@ torchnldm.model.ae module
    :undoc-members:
    :show-inheritance:
 
-torchnldm.model.nde module
+torchnldm.model.nde 
 --------------------------
 
 .. automodule:: torchnldm.model.nde
@@ -20,18 +17,10 @@ torchnldm.model.nde module
    :undoc-members:
    :show-inheritance:
 
-torchnldm.model.nldm module
+torchnldm.model.nldm 
 ---------------------------
 
 .. automodule:: torchnldm.model.nldm
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-Module contents
----------------
-
-.. automodule:: torchnldm.model
    :members:
    :undoc-members:
    :show-inheritance:
